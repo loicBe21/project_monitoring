@@ -1,0 +1,20 @@
+<table class="table-tasks" id="" style="font-size: 11px;margin-left:0px">
+        <thead>
+          <tr>
+            <th>Nom d'utilisateur</th>
+            <!-- <th>Description</th> -->
+            <th>Adresse e-mail</th>
+            <th>Droit</th>
+          </tr>
+        </thead>
+        <tbody>
+        <%= for ac <- @acs do %>
+          <tr>
+            <td data-label="Nom d'utilisateur"><%= ac.user.username %></td>
+            <td data-label="Adresse e-mail"><%= ac.user.email %></td>
+            <td data-label="Droit"><%= ac.rights_clients.name %></td>
+
+          </tr>
+        <% end %>
+        </tbody>
+</table>
