@@ -19,7 +19,7 @@ html {
 
 body {
   color: #000000;
-  font-family: "Manrope";
+  font-family: 'Arial';
   font-size: 1.6em;
   font-weight: 300;
   letter-spacing: .01em;
@@ -294,11 +294,45 @@ input[type='radio'] {
 
 .container {
   margin: 0 auto;
-  max-width: 112.0rem;
+/*  max-width: 112.0rem;*/
+
+  /* max-width: 80%; */ /* Modification Ravo*/
+
   padding: 0 2.0rem;
   position: relative;
   width: 100%
 }
+
+/* Start Ravo Modification */
+
+.body-bg .container .row .my__company__title {
+  height: 130px;
+  width: 80%;
+}
+
+h3 {
+  font-size: 3.2rem;
+}
+
+.body-bg .container .row .col {
+  font-size: 16px;
+}
+
+.body-bg .container .row .col {
+  font-size: 16px;
+}
+
+.body-bg .container .detail-task-2 {
+  box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+  height: 73vh;
+  width: 80% !important;
+}
+
+.body-bg .container .detail-task-2 .row .col {
+  width: 100%;
+}
+
+/* End Ravo Modification */
 
 .row {
   display: flex;
@@ -465,7 +499,7 @@ input[type='radio'] {
 @media (min-width: 40rem) {
   .row {
     flex-direction: row;
-    margin-left: -1.0rem;
+   /* margin-left: -1.0rem;*/
     width: calc(100% + 2.0rem)
   }
 
@@ -683,16 +717,9 @@ pre {
   padding: 1em;
 }
 
-.container {
-  margin: 0 auto;
-  max-width: 80.0rem;
-  padding: 0 2.0rem;
-  position: relative;
-  width: 100%
-}
-
 select {
-  width: auto;
+  /* Size of all the select inside 'table-excel' in saisie de temps - Ravo */
+  width: 100%;
 }
 
 /* Phoenix promo and logo */

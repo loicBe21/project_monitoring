@@ -15,7 +15,7 @@
 
       <div class="wrapper site-header__wrapper">
         <%= link "Monitoring - Phidia", to: Routes.user_path(@socket, :index), class: "brand" %>
-        
+
         <div class="mobile__notif" style="display: inline-block;">
           <% unseens = PmLogin.Services.list_my_notifications(@curr_user_id)
           |> Enum.count(fn(x) -> !(x.seen) end) %>
@@ -66,7 +66,7 @@
              <div class="dropdown">
               <li class="dropbtn nav__item__link" style="margin-top: -4px">
                 <a class="nav__item__link">
-                  <span class="material-icons mat__ico">receipt_long</span> <p>Mes requêtes</p> 
+                  <span class="material-icons mat__ico">receipt_long</span> <p>Mes requêtes</p>
                 </a>
               </li>
               <div class="dropdown-content">
@@ -78,7 +78,7 @@
                   <a href={Routes.clients_request_path(@socket, :my_company_requests_2)} class="nav__item__link" style="margin-top: 4px">
                     <i class="bi bi-person-plus" style="font-size: 15px"></i>
                     <p>Toutes les requêtes</p>
-                    
+
                   </a>
                 </li>
               </div>
@@ -169,7 +169,7 @@
   </body>
   <footer id="foot" class="container-fluid">
     <div id="footcont" class="container">
-      <p><span id="copyright__icon" class="material-icons">copyright</span>copyright Phidia / Project monitoring</p>
+      <p><span id="copyright__icon" class="material-icons">copyright</span>copyright Phidia / Project monitoring - 2024</p>
     </div>
 
   </footer>

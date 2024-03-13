@@ -1,0 +1,48 @@
+<h1> VALIDATION DES TACHES </h1>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+<!-- /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+<table>
+    <thead>
+        <tr>
+            <th>Projet</th>
+            <th>Nom de la Tâche</th>
+            <th>Description</th>
+            <th>Début de la Tâche</th>
+            <th>Fin de la Tâche</th>
+            <th>Contributeur</th>
+            <th>Option</th>
+        </tr>
+    </thead>
+    <tbody>
+        <%= for task <- @tasks_to_validate do %>
+        <tr>
+            <td><%= task.project.title %></td>
+            <td><%= task.title %></td>
+            <td><%= task.description%></td>
+            <td><%= task.date_start %></td>
+            <td><%= task.deadline %></td>
+            <td><%= task.contributor.username %></td>
+            <td>
+                <button phx-click="validate_task" phx-value-task_id={task.id}>Accepter</button>
+                <button>Refuser</button>
+            </td>
+        </tr>
+        <% end %>
+
+    </tbody>
+</table>

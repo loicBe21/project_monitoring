@@ -1,7 +1,7 @@
 {
   "devDependencies": {
     "@types/chart.js": "^2.9.37",
-    "cypress": "^10.3.0"
+    "cypress": "^13.5.1"
   },
   "dependencies": {
     "@shopify/draggable": "^1.0.0-beta.8",
@@ -10,7 +10,10 @@
     "chart.js": "^3.8.0",
     "chart.js-plugin-labels-dv": "^3.1.0",
     "chartjs-plugin-datalabels": "^2.0.0",
+    "jquery": "3.7.1",
     "material-icons": "^1.10.8",
+    "select2": "^4.0.13",
+    "tom-select": "^2.3.1",
     "yarn": "^1.22.18"
   }
 }

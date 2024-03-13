@@ -5,6 +5,7 @@ defmodule PmLoginWeb.TaskController do
   alias PmLogin.Monitoring.Task
   alias PmLogin.Login
   alias Phoenix.LiveView
+  alias PmLogin.SaisieTemps
 
   # def index(conn, _params) do
   #   tasks = Monitoring.list_tasks()
@@ -60,6 +61,18 @@ defmodule PmLoginWeb.TaskController do
     end
 
   end
+
+  def task_need_validation(conn , %{"id" => id}) do
+    if Login.is_connected?(conn) do
+      LiveView.Controller.live_render(conn, PmLoginWeb.Task.TaskNeedValidationLive, session: %{"curr_user_id" => get_session(conn, :curr_user_id), "id" => id}, router: PmLoginWeb.Router)
+    else
+      conn
+      |> Login.not_connected_redirection
+    end
+
+
+  end
+
   def update(conn, %{"id" => id, "task" => task_params}) do
     task = Monitoring.get_task!(id)
 
@@ -82,4 +95,15 @@ defmodule PmLoginWeb.TaskController do
     |> put_flash(:info, "Tâche supprimée.")
     |> redirect(to: Routes.task_path(conn, :index))
   end
+
+
+
+ def task_by_project(conn, %{"project_id" => project_id}) do
+    tasks = SaisieTemps.get_tasks_by_project(String.to_integer(project_id))
+    json(conn, tasks)
+  end
+
+
+
+
 end

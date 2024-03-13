@@ -14,6 +14,7 @@ defmodule PmLogin.Login.User do
     field :profile_picture, :string
     field :username, :string
     field :right_id, :id
+    field :phone_number, :string
     # field :current_record_id, :id
     # field :function_id, :id
     belongs_to :current_record, TaskRecord
@@ -164,16 +165,18 @@ defmodule PmLogin.Login.User do
 
   def profile_changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email])
+    |> cast(attrs, [:username, :email , :phone_number])
     |> validate_required(:username, message: "Nom d'utilisateur ne peut pas être vide")
     |> validate_required(:email, message: "Adresse éléctronique ne peut pas être vide")
     |> unique_constraint(:username, message: "Nom d'utilisateur déjà pris")
     |> validate_format(:email, ~r<(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])>, message: "Format d'email non valide")
+    |> validate_format(:phone_number, ~r/\A\d{10}\z/, message: "doit être un numéro de téléphone valide")
     |> unique_constraint(:email, message: "Adresse email déjà pris")
     |> upload_profile_pic(attrs)
   end
 
   def upload_profile_pic(changeset, attrs) do
+      IO.puts "makato aloh le izy"
       upload = attrs["photo"]
       case upload do
         nil -> changeset
@@ -181,11 +184,35 @@ defmodule PmLogin.Login.User do
         _ ->
         extension = Path.extname(upload.filename)
         username = get_field(changeset, :username)
-        profile_pic_path = "profiles/#{username}-profile#{extension}"
-        path_in_db = "images/#{profile_pic_path}"
-        File.cp(upload.path, "assets/static/images/#{profile_pic_path}")
+        profile_pic_path = "#{username}-profile#{extension}"
+        path_in_db = "#{profile_pic_path}"
 
-        put_change(changeset, :profile_picture, path_in_db )
+       # IO.inspect "Répertoire actuel : #{current_directory}"
+        IO.inspect File.exists?(upload.path)
+        IO.inspect File.exists?("priv/static/profile_pic")
+        IO.inspect File.dir?("priv/static/profile_pic")
+        destination_path = Path.expand("priv/static/profile_pic/#{profile_pic_path}")
+        IO.inspect File.ls("priv/static/profile_pic")
+        IO.inspect path_in_db
+        IO.inspect destination_path
+        case File.cp(upload.path, destination_path) do
+          :ok ->
+            IO.puts "La copie du fichier a réussi avec succès."
+            put_change(changeset, :profile_picture, path_in_db)
+          {:error, reason} ->
+            IO.puts "Échec de la copie du fichier. Raison 1 : #{reason}"
+            # Traite l'échec de la copie ici, si nécessaire.
+            changeset
+
+          {:error , eisdir } ->
+            IO.puts "Échec de la copie du fichier. Raison 2 : #{eisdir}"
+            changeset
+        end
+
+        #put_change(changeset, :profile_picture, path_in_db )
+        #File.cp(upload.path, "/priv/static/images/profiles/#{profile_pic_path}")
+
+
       end
   end
 
@@ -217,7 +244,7 @@ defmodule PmLogin.Login.User do
 
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email, :password, :function_id, :current_record_id])
+    |> cast(attrs, [:username, :email, :password, :function_id, :current_record_id , :phone_number])
     |> validate_required_username
     |> validate_required_password
     |> validate_required_email
@@ -226,6 +253,7 @@ defmodule PmLogin.Login.User do
     |> unique_constraint(:email, message: "Adresse e-mail déjà utilisée")
     |> validate_confirmation(:email, message: "Ne correspond pas à l'adresse mail donnée")
     |> validate_confirmation(:password, message: "Les mots de passe ne correspondent pas")
+    |>validate_format(:phone_number, ~r/\A\d{10}\z/, message: "doit être un numéro de téléphone valide")
     |> crypt_pass
     |> put_default_right
     |> put_default_profile_picture

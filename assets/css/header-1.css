@@ -50,6 +50,12 @@
   #main {
     /* padding-top: 20%; */
   }
+  .container {
+    max-width: 100%;
+  }
+  .conteneur_bas{
+    margin-top : 40px;
+  }
 }
 
 @media (max-width: 720px) {

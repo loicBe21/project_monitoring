@@ -21,6 +21,7 @@ defmodule PmLogin.Monitoring.Task do
     field :hidden, :boolean
     field :without_control, :boolean
     field :is_major, :boolean
+    field :is_valid, :boolean, default: true  # Nouveau champ avec la valeur par défaut
     # field :parent_id, :id
     # field :parent_id, :id
     # field :project_id, :id
@@ -73,6 +74,33 @@ defmodule PmLogin.Monitoring.Task do
     |> validate_required([:title, :progression, :date_start, :date_end, :estimated_duration, :performed_duration, :deadline])
   end
 
+  defp put_default_values_last_modif(changeset) do
+    changeset
+    |> put_change(:date_start,  NaiveDateTime.local_now() |> NaiveDateTime.to_date())
+  end
+
+
+
+  def changeset_2(task, attrs) do
+    task
+    |> cast(attrs, [:title, :description, :attributor_id, :progression, :date_start, :date_end, :estimated_duration, :performed_duration, :deadline, :is_major , :is_valid])
+    |> validate_required([:title, :progression, :date_start, :date_end, :estimated_duration, :performed_duration, :deadline])
+    |> put_default_values_last_modif()
+  end
+
+  defp put_non_valided_status(changeset) do
+    changeset
+    |> put_change(:is_valid, false)
+  end
+
+  def changeset_contributor_task_non_valided(task, attrs) do
+    task
+    |> cast(attrs, [:title, :description, :attributor_id, :progression, :date_start, :date_end, :estimated_duration, :performed_duration, :deadline, :is_major])
+    |> validate_required([:title, :progression, :date_start, :date_end, :estimated_duration, :performed_duration, :deadline])
+    |> put_default_values_last_modif()
+    |>put_non_valided_status()
+  end
+
   def update_changeset(task, attrs) do
     task
     |> cast(attrs, [:title, :description, :progression, :deadline,:date_start, :date_end, :estimated_duration, :performed_duration, :contributor_id, :priority_id, :status_id, :is_major, :clients_request_id])
@@ -107,7 +135,7 @@ defmodule PmLogin.Monitoring.Task do
   def secondary_changeset(task, attrs) do
     IO.inspect attrs
     task
-    |> cast(attrs, [:parent_id, :without_control, :title, :description, :priority_id, :contributor_id,:attributor_id, :project_id,:date_start, :date_end, :estimated_duration, :deadline, :is_major])
+    |> cast(attrs, [:parent_id, :without_control, :title, :description, :priority_id, :contributor_id,:attributor_id, :project_id,:date_start, :date_end, :estimated_duration, :deadline, :is_major , :is_valid])
     |> validate_required(:parent_id ,message: "Entrez une tâche parente")
     |> validate_required(:attributor_id,message: "La tâche n'a pas d'Attributeur")
     |> validate_required(:title, message: "Entrez tâche")
@@ -119,13 +147,13 @@ defmodule PmLogin.Monitoring.Task do
     # |> validate_required(:date_end, message: "Entrez date de fin")
     |> validate_required(:deadline, message: "Entrez date d'échéance")
     |> Monitoring.validate_start_end
-    |> Monitoring.validate_dates_without_dtend
+    #|> Monitoring.validate_dates_without_dtend
     |> Monitoring.validate_start_deadline
     |> Monitoring.validate_positive_estimated
     |> put_change(:progression, 0)
     |> put_change(:performed_duration, 0)
     |> put_change(:status_id, 1)
-    |> put_change(:date_start, Services.current_date |> NaiveDateTime.to_date)
+    #|> put_change(:date_start, Services.current_date |> NaiveDateTime.to_date)
     |> put_change(:inserted_at, Services.current_date)
   end
 
@@ -141,15 +169,15 @@ defmodule PmLogin.Monitoring.Task do
       # IO.puts("tafiditra create task")
       # IO.inspect(attrs)
         task
-        |> cast(attrs, [:title, :description, :without_control,:attributor_id, :contributor_id, :project_id, :date_start, :estimated_duration, :deadline, :is_major])
+        |> cast(attrs, [:title, :description, :without_control,:attributor_id, :contributor_id, :project_id, :date_start, :estimated_duration, :deadline, :is_major , :is_valid])
         |> validate_required(:title, message: "Entrez tâche")
         |> unique_constraint(:title, message: "Tâche déjà existante")
         |> validate_length(:title, max: 300, message: "Nom de tâche trop long !")
         |> validate_length(:description, max: 800, message: "Description trop longue !")
         |> validate_required(:estimated_duration, message: "Entrez estimation")
-        # |> validate_required(:date_start, message: "Entrez date de début")
+        |> validate_required(:date_start, message: "Entrez date de début")
         |> validate_required(:deadline, message: "Entrez date d'échéance")
-        |> Monitoring.validate_dates_without_dtend
+        #|> Monitoring.validate_dates_without_dtend
         |> Monitoring.validate_start_deadline
         |> Monitoring.validate_positive_estimated
         |> put_change(:progression, 0)
@@ -158,7 +186,7 @@ defmodule PmLogin.Monitoring.Task do
         |> put_change(:performed_duration, 0)
         |> put_change(:priority_id, 2)
         |> put_change(:status_id, 1)
-        |> put_change(:date_start, Services.current_date |> NaiveDateTime.to_date)
+        #|> put_change(:date_start, Services.current_date |> NaiveDateTime.to_date)
         |> put_change(:inserted_at, Services.current_date)
 
 
@@ -184,6 +212,27 @@ defmodule PmLogin.Monitoring.Task do
         # |> put_change(:status_id, 1)
 
   end
+  def create_changeset_2(task, attrs) do
+        task
+        |> cast(attrs, [:title, :description, :without_control,:attributor_id, :contributor_id, :project_id, :date_start, :estimated_duration, :deadline, :is_major])
+        |> validate_required(:title, message: "Entrez tâche")
+        |> unique_constraint(:title, message: "Tâche déjà existante")
+        |> validate_length(:title, max: 300, message: "Nom de tâche trop long !")
+        |> validate_length(:description, max: 800, message: "Description trop longue !")
+        |> validate_required(:estimated_duration, message: "Entrez estimation")
+        # |> validate_required(:date_start, message: "Entrez date de début")
+        |> validate_required(:deadline, message: "Entrez date d'échéance")
+        |> Monitoring.validate_dates_without_dtend
+        |> Monitoring.validate_start_deadline
+        |> Monitoring.validate_positive_estimated
+        |> put_change(:progression, 0)
+        # |> put_change(:status_id, stage.status_id)
+        # |> put_change(:project_id, pro_id)
+        |> put_change(:performed_duration, 0)
+        |> put_change(:priority_id, 2)
+        |> put_change(:status_id, 1)
+        |> put_change(:inserted_at, Services.current_date)
+  end
 
   def update_moth_prg_changeset(task, attrs) do
     task
@@ -203,6 +252,20 @@ defmodule PmLogin.Monitoring.Task do
         changeset |> put_change(:achieved_at, NaiveDateTime.local_now)
       true -> changeset
     end
+
+
+
+
+
+  end
+
+
+
+  def update_task_validation(task , attrs) do
+    task
+    |>cast(attrs , [:attributor_id,:is_valid])
+    |> put_change(:is_valid, true)
+
 
   end
 

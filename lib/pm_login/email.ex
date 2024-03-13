@@ -144,9 +144,12 @@ defmodule PmLogin.Email do
 
     new()
     |> from("monitoring@mgbi.mg")
-    |> to("andriamihajasambatra@gmail.com")
+    |> to("loicRavelo05@gmail.com")
     |> subject("[TEST MAIL]")
     |> html_body(html_text)
     |> Mailer.deliver()
   end
+
+
+
 end

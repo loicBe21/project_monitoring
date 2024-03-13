@@ -181,7 +181,6 @@ defmodule PmLoginWeb.LiveComponent.TaskModalFromRecordLive do
       self(),
       {__MODULE__, :button_clicked, %{action: left_button_action, param: left_button_param}}
     )
-
     {:noreply, socket}
   end
 end

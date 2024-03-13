@@ -5,6 +5,7 @@ defmodule PmLoginWeb.Project.LogsLive do
   alias PmLogin.Monitoring
   alias PmLogin.Kanban
   alias PmLogin.Monitoring.{Task}
+  alias PmLogin.Utilities
 
 
   def mount(_params, %{"curr_user_id" => curr_user_id}, socket) do
@@ -69,6 +70,7 @@ defmodule PmLoginWeb.Project.LogsLive do
           curr_user_id: curr_user_id,
           list_projects: Monitoring.list_projects,
           list_tasks: Monitoring.list_tasks,
+          export: Utilities.export(Monitoring.list_tasks),
           list_tasks_updated_today: Monitoring.list_tasks_filtered_by_date_today,
           list_tasks_updated_yesterday: Monitoring.list_tasks_updated_yesterday,
           list_tasks_updated_a_month_ago: Monitoring.list_tasks_updated_a_month_ago,
@@ -147,7 +149,7 @@ defmodule PmLoginWeb.Project.LogsLive do
           Monitoring.list_tasks_by_contributor_id(contributor_id)
       end
 
-    {:noreply, socket |> assign(list_tasks: list_tasks_by_contributor_id)}
+    {:noreply, socket |> assign(list_tasks: list_tasks_by_contributor_id , export: Utilities.export(list_tasks_by_contributor_id))}
   end
 
 

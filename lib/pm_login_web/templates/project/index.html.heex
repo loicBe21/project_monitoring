@@ -30,43 +30,52 @@
 .table-sortable .th-sort-desc {
   background: rgba(0, 0, 0, 0.1);
 }
+.projet_list_and_controle{
+  background-color: gainsboro;
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 20px;
+  padding: 10px;
+  padding-top: 30px;
+  margin-left: 20%;
+  margin-right: 20%;
+  border-radius: 15px;
+  height: 95px;
+
+}
+.projet_list_and_controle .barre_de_recherche input{
+color :black;
+border-color: black;
+}
+.projet_list_and_controle #project_status_id {
+color :black;
+border-color: black;
+}
+
 
 </style>
 <!-- CREATION DE PROJET-->
 <div>
   <%= if PmLogin.Login.get_user!(@curr_user_id).right_id==1 or PmLogin.Login.get_user!(@curr_user_id).right_id==2 do %>
-      <div style="display:flex">
-          <div class="row button-project-list">
-            <a href={ Routes.project_path(@socket, :new) } class="btn btn-lg btn-primary" style="    height: 3.8rem;
-            display: flex;
-            align-items: center; gap: 1rem">
-              <i class="bi bi-plus-circle" style="font-size: 1.7rem;"></i> Nouveau projet
-            </a>
+      <div class="projet_list_and_controle">
+        <button class="card-button">
+          <a href={ Routes.project_path(@socket, :new) } style="color:white;">Nouveau projet</a>
+        </button>
+        <form phx-change="search-project">
+          <div class="barre_de_recherche">
+            <input type="text" name="project_search" id="projectSearch" placeholder="Rechercher un projet">
           </div>
-          <div class="row">
-            <div class="col" style={"display: flex; width:50%;margin-bottom:2rem;"}>
-             <form phx-change="search-project">
-              <div class="project-search">
-              
-                <input type="text" name="project_search" id="projectSearch" placeholder="Rechercher un projet" style="width: 20rem;margin-top: -0.5rem;margin-right: -5rem;">
-              </div>
-              </form>
-          </div>
-          <div class="col" style="display: flex;width:50%;">
-            <form phx-change="status-project">
-              <select id="project_status_id" name="status_id" style="width: -moz-available;
-                margin-left: 2rem;
-                height: 3.8rem;">
-                  <option value="0">Tout</option>
-                  <option value="1">A faire</option>
-                  <option value="2">En blocage</option>
-                  <option value="3">En cours</option>
-                  <option value="4">En contrôle</option>
-                  <option value="5">Achevée(s)</option>
-              </select>
-            </form>
-          </div>  
-        </div>
+        </form>
+        <form phx-change="status-project">
+          <select id="project_status_id" name="status_id" style="width: -moz-available;height: 3.8rem;">
+              <option value="0">Tout</option>
+              <option value="1">A faire</option>
+              <option value="2">En blocage</option>
+              <option value="3">En cours</option>
+              <option value="4">En contrôle</option>
+              <option value="5">Achevée(s)</option>
+          </select>
+        </form>
       </div>
     <% end %>
 </div>

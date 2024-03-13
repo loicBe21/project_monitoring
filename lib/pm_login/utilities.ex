@@ -1,8 +1,12 @@
 defmodule PmLogin.Utilities do
   use Phoenix.HTML
   import PmLoginWeb.Gettext
+  import CSV
+  alias PmLogin.Monitoring
+  alias PmLogin.Login
 
-  
+
+
  def local_gmt3 do
     NaiveDateTime.local_now
     |>NaiveDateTime.add(3)
@@ -16,6 +20,10 @@ defmodule PmLogin.Utilities do
 
   def simple_date_format(naive_dt) do
     Calendar.strftime(naive_dt, "%d/%m/%Y")
+  end
+
+  def simple_date_format1(naive_dt) do
+    Calendar.strftime(naive_dt, "%Y-%m-%d")
   end
 
   def simple_date_format_with_hours(naive_dt) do
@@ -175,6 +183,98 @@ defmodule PmLogin.Utilities do
     end
 
   end
+
+
+
+
+  defp to_csv_line(task) do
+    if not is_nil(task.contributor_id) do
+      [task.id , task.title , Monitoring.list_statuses_by_id(task.status_id).title , Login.list_contributors_users(task.contributor_id).username ,simple_date_format(task.date_start) , simple_date_format(task.deadline)]
+    else
+      [task.id , task.title , Monitoring.list_statuses_by_id(task.status_id).title , Login.list_contributors_users(task.attributor_id).username , simple_date_format(task.date_start) , simple_date_format(task.deadline)]
+
+    end
+  end
+
+  defp fetch_data_for_csv(task_list) do
+    headers = ["id", "description" , "status" , "user_id" , "date_start" , "date_end"]
+    csvLines = Enum.map(task_list, &to_csv_line/1)
+    real_data = [headers | csvLines]
+    real_data
+  end
+
+
+  defp csv_content_generator(task_list) do
+    task_list
+    |> fetch_data_for_csv()
+    |> CSV.encode
+    |> Enum.to_list
+    |> to_string
+  end
+
+  def export(task_list) do
+    csv_content_generator(task_list)
+  end
+
+
+  #fonction qui cree une liste de map pour chaque ligne (rows) avec le cles donnes en parametre
+  #dans columns
+  #utile pour recuperer les resultat d'une requete sql
+  def build_result(columns, rows) do
+    new_columns = Enum.map(columns, &String.to_atom/1)
+
+    rows
+    |> Enum.map(fn row ->
+      Enum.zip(new_columns, row)
+      |> Enum.into(%{})
+    end)
+  end
+
+
+  #parse string date to date elixir
+  def parse_date_string(date_str) do
+    case Date.from_iso8601(date_str) do
+      {:ok, date} -> date
+      {:error, _reason} -> nil
+    end
+  end
+
+
+  #parse date to html date format
+  #use to send date in request url
+  def parse_date_to_html(date)  do
+    Date.to_string(date)
+  end
+
+  #pars minute values to "hh:mm" format
+ def parse_minutes_to_time(minutes) do
+    hours = div(minutes, 60)
+    remaining_minutes = rem(minutes, 60)
+    "#{String.pad_leading("#{hours}", 2, "0")}h #{String.pad_leading("#{remaining_minutes}", 2, "0")} min"
+  end
+
+
+
+
+  def current_datetime(date) do
+    {:ok, {year, month, day}} = Date.from_iso8601(date)
+    {hour, min, sec} = NaiveDateTime.now() |> NaiveDateTime.to_time()
+
+    NaiveDateTime.new(year, month, day, hour, min, sec)
+  end
+
+
+  #pars an date elixir format "yyyy - mm - dd" to french format "dd/mm/yyyy"
+  def french_date_format_by_date(date) do
+    #create naive dt by this date
+    date_time_today = date_to_naive(date)
+    #parse naive date to french date format
+    simple_date_format(date_time_today)
+  end
+
+
+
+
 
 
 

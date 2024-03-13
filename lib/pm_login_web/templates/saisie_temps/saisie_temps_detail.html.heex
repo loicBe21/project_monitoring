@@ -1,0 +1,278 @@
+<!--<h3 style=" font-size: 18px;white-space: nowrap;"><a href="" class="" style="padding-bottom: : 10px;" id="adm">>>Espace
+        administrateur>></a></h3> !-->
+<div class="navbar">
+    <div class="user-details">
+      
+  
+        <h2><%= @user_saisie.username %></h2>
+        
+   
+        <div class="user-info">
+            <%= if @validation_line != nil  do %>
+             <span class="badge badge-green normal-size">Saisie validée</span>
+            <% else %>
+            <span class="badge badge-orange normal-size">Non validée</span>
+            <% end %>
+            <span >Date du saisie: <%= Utilities.french_date_format_by_date(@date_saisie_format_date) %> </span>
+            <span >Total heure(s): <%= @total_heure %> </span>
+            <span>Nombre de ligne(s) : <%= length(@my_saisie) %></span>
+            <%= if @validation_line != nil  do %>
+            <span>Validé par : <%= @validation_line.user_validator %> </span>
+            <span>Date de  validation : <%= Utilities.simple_date_format_with_hours(@validation_line.inserted_at) %> </span>
+            <% end %>
+        </div>
+    </div>
+    <div class="buttons">
+        <%= if @validation_line != nil  do %>
+        <a href="#" class="btn btn-danger">annuler la validation</a>
+        <% else %>
+        <a href="#" class="btn btn-primary">validé</a>
+        <% end %>
+        <a href={Routes.saisie_temps_path(@socket, :index_admin1 , start_date: Utilities.parse_date_to_html(@start_date) , end_date: Utilities.parse_date_to_html(@end_date), status: @status, right: @right )}
+            class="btn btn-lg btn-secondary"><i class="bi bi-arrow-bar-left"></i>retour</a>
+    </div>
+</div>
+
+
+
+
+<div class="my_row" style="display: none;">
+    <div class="my_col">
+        <div id="header">
+            <div id="user-info">Utilisateur : <span id="user-name"><%= @user_saisie.username %></span></div>
+            <div id="user-info">Total heure(s): <span id="user-name"><%= @total_heure %></span></div>
+            <div id="current-date">Saisie du : <span id="current-date-value"><%= Utilities.french_date_format_by_date(@date_saisie_format_date) %></span></div>
+            <div id="current-date">Nombre de ligne(s)  : <span
+                    id="current-date-value"><%= length(@my_saisie) %></span></div>
+        </div>
+    </div>
+    <div class="my_col" style="text-align: right;"> <!-- Aligner à droite -->
+        <a href={Routes.saisie_temps_path(@socket, :index_admin1 , start_date: Utilities.parse_date_to_html(@start_date) , end_date: Utilities.parse_date_to_html(@end_date), status: @status, right: @right )} class="btn btn-lg btn-secondary"><i class="bi bi-arrow-bar-left"></i>retour</a>
+    </div>
+    
+</div>
+
+<%= if @validation_line != nil  do %>
+<div id="info-saisie" class="info-saisie" style="display: none; align-items: center; justify-content: space-between;">
+    <div>
+        <p><span class="badge badge-green">Saisie validée</span></p>
+        <p><span class="label">Validé par :</span> <%= @validation_line.user_validator %></p>
+        <p><span class="label">Date de validation :</span>
+            <%= Utilities.simple_date_format_with_hours(@validation_line.inserted_at) %></p>
+    </div>
+   <!-- <button class="btn btn-lg btn-danger" phx-click="delete_validation_line" phx-value-validation_line_id={@validation_line.id}>Anuler la validation</button> !-->
+</div>
+
+
+
+<% end %>
+
+
+
+
+<div id="table-container" style="max-height: 500px; overflow-y: scroll; width: 100%; margin-top: 20px;">
+    
+        <table id="excel-table" class="table-excel">
+            <thead style="position: sticky; top: 0; z-index: 1; background-color: #fff;">
+                <tr>
+                    
+                    <th style="width: 50px;">Date</th>
+                    <th style="width: 50px;">Utilisateur</th>
+                    <th style="width: 150px;">
+                       Projet
+
+                    </th>
+                    <th style="width: 150px;">Tâche</th>
+                    <th style="width: 200px;">Libellés</th>
+                    <th style="width: 20px;">
+                       temps
+                    </th>
+                    <th style="width: 40px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="record-table-body">
+                <%= for siaise <- @my_saisie do %>
+                <tr>
+                   
+                    <td><%= @date_saisie %></td>
+                    <td><%= siaise.username %></td>
+                    <td><%= siaise.project_title %></td>
+                    <td><%= siaise.task_title %></td>
+                    <td><%= siaise.libele %></td>
+                    <td><%= siaise.time_value %></td>
+                    <td>
+                        <%= if @is_already_validee == {false , nil } do %>
+                            <i title="modifier" class="bi bi-pencil" phx-click="edit_entrie" phx-value-entrie_id={siaise.id}></i> 
+                            <i title="Supprimer" class="bi bi-trash" phx-click="delete_entrie" phx-value-entrie_id={siaise.id} ></i> 
+                        <% else %>
+                             ---
+                        <% end %>
+                    </td>
+                </tr>
+                <% end %>
+                
+            </tbody>
+        </table>
+    
+    
+</div>
+<%= if @is_already_validee == {false , nil } do %>
+<div style="margin-top: 10px;">
+
+    <a id="addRowIcon" title="Ajouter une ligne" class="btn btn-lg btn-secondary"><i title="Ajouter une ligne"
+            class="bi bi-plus bi-3x" style="cursor: pointer;"></i></a>
+</div>
+<% end %>
+
+<%= live_component(
+            PmLoginWeb.LiveComponent.ModifTimeEntriesComponent,
+            id: "confirm-arch",
+            title: "modifier une etrée" ,
+            body: nil ,
+            entrie: @entrie_to_edit ,
+            entrie_project: @entrie_project ,
+            entrie_task: @entrie_task ,
+            projects: @projects,
+            tasks: @tasks ,
+            project_select_state: @project_select_state ,
+            left_button: "Annuler",
+            left_button_action: "cancel",
+            show_modal: @show_modal
+           
+            
+
+        )
+%>
+
+
+<script>
+
+
+    // Fonction pour sauvegarder une ligne
+    function saveRow(icon) {
+        const row = icon.closest('tr');
+        const inputs = row.querySelectorAll('input, select'); // Correction ici
+        const rowData = {};
+        inputs.forEach(input => {
+            rowData[input.name] = input.value;
+        });
+        // Vous pouvez maintenant soumettre cette ligne de données à votre backend ou effectuer d'autres actions
+        console.log("Données à sauvegarder:", rowData);
+
+        // Récupérer le jeton CSRF depuis un champ caché dans le formulaire
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        // Envoi des données au backend avec le jeton CSRF
+        fetch('/save_saisie', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken  // Inclure le jeton CSRF dans les en-têtes de la requête
+            },
+            body: JSON.stringify(rowData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la sauvegarde des données');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Faire quelque chose avec la réponse du backend si nécessaire
+                console.log('Réponse du backend :', data);
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Erreur :', error);
+                window.location.reload();
+            });
+    }
+    // Fonction pour supprimer une ligne
+    function removeRow(icon) {
+        icon.closest('tr').remove();
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableBody = document.getElementById('record-table-body');
+        const addRowIcon = document.getElementById('addRowIcon');
+
+        // Fonction pour ajouter une nouvelle ligne au tableau
+        function addRow() {
+            const newRow = `
+            <tr>
+                <input type="hidden" name="user_id" value="<%= @user_saisie.id %>" >
+                <td><input type="date" name="date" value="<%= @date_saisie %>"></td>
+                <td><input type="text" name="user" value="<%= @user_saisie.username %>" readonly></td>
+                <td class="project_id">
+                    <select name="project_id">
+                        <option value="">Sélectioner un projet</option>
+                        <%= for project <- @projects do %>
+                            <option value="<%= project.id %>"><%= project.title %></option>
+                        <% end %>
+                    </select>
+                </td>
+                <td class="task">
+                    <select name="task"></select> <!-- Cette balise sera remplie avec les tâches associées au projet sélectionné -->
+                </td>
+                <td class="labels"><input type="text" name="labels" placeholder="Libellé" ></td>
+                <td>
+                   
+                    <input type="number" id="decimal_input" name="hours" step="0.01" value="0.0">
+                </td>
+                <td>
+                    <i title="Sauvegarder" class="bi bi-save" style="cursor: pointer;" onclick="saveRow(this)"></i>
+                    <i title="Supprimer" class="bi bi-trash" style="cursor: pointer;" onclick="removeRow(this)"></i>
+                </td>
+            </tr>
+        `;
+            tableBody.insertAdjacentHTML('beforeend', newRow);
+
+            // Sélection de la liste déroulante des projets à l'intérieur de la fonction addRow
+            const projectSelect = document.querySelector('select[name="project_id"]');
+            console.log(projectSelect);
+            // Écouteur d'événements pour détecter les changements en temps réel dans la liste déroulante des projets
+            projectSelect.addEventListener('change', function (event) {
+                const selectedProjectId = event.target.value;
+                updateTaskOptions(selectedProjectId);
+            });
+
+        }
+
+        // Ajouter un écouteur de clic à l'icône pour ajouter une ligne
+        addRowIcon.addEventListener('click', addRow);
+
+
+        // Fonction pour mettre à jour les options du menu déroulant des tâches en fonction du projet sélectionné
+        // Fonction pour mettre à jour les options du menu déroulant des tâches en fonction du projet sélectionné
+        function updateTaskOptions(selectedProjectId) {
+            // Votre logique pour mettre à jour les options du menu déroulant des tâches ici
+            console.log('Projet sélectionné:', selectedProjectId);
+
+            // Effectuer une requête AJAX vers votre endpoint backend pour récupérer les tâches associées au projet sélectionné
+            fetch(`/tasks/${selectedProjectId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur lors de la récupération des tâches');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Mettre à jour la liste déroulante des tâches avec les données récupérées
+                    const taskSelect = document.querySelector('select[name="task"]');
+                    taskSelect.innerHTML = ''; // Effacer les options précédentes
+                    data.forEach(task => {
+                        const option = document.createElement('option');
+                        option.value = task.id;
+                        option.textContent = task.title; // Assurez-vous que task a une propriété appropriée pour le titre
+                        taskSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur :', error);
+                });
+        }
+    });
+
+
+</script>

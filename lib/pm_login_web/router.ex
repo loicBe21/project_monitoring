@@ -1,4 +1,5 @@
 defmodule PmLoginWeb.Router do
+  alias PmLoginWeb.SaisieTemps.SaisieIndexLive
   use PmLoginWeb, :router
 
 # COMMENTED ROUTES ARE NOT TO BE DELETED BUT JUST NOT USED AT THE TIME
@@ -18,6 +19,17 @@ defmodule PmLoginWeb.Router do
 
   scope "/", PmLoginWeb do
     pipe_through :browser
+
+
+    #saisie de temps
+   # get "/saisie_temps" , SaisieTempsController, :index
+   # get "/saisie_temps_views" , SaisieTempsController, :index_admin
+    #get "/saisie_details/:id/:date" , SaisieTempsController , :details
+    get "/saisie_index" , SaisieTempsController , :index_saisie
+    get "/saisie_admin" , SaisieTempsController , :index_admin1
+    post "/save_saisie" , SaisieTempsController , :create
+    get "/saisie_detailstemps/:id/:date" , SaisieTempsController , :details1
+
 
     #contributor route
     get "/logs", ProjectController, :logs
@@ -40,6 +52,8 @@ defmodule PmLoginWeb.Router do
     get "/contributors/:id", ProjectController, :show_contributor
     # resources "/priorities", PriorityController
     resources "/tasks", TaskController, except: [:index, :edit, :show, :new]
+    get "/tasks/:project_id" , TaskController , :task_by_project
+    get "/tasks_unvalided/:id" , TaskController , :task_need_validation
     # resources "/comments", CommentController
 
     #Login context
@@ -93,6 +107,11 @@ defmodule PmLoginWeb.Router do
     get "/client_tasks_2", ClientsRequestController, :client_tasks_2
     resources "/clients_request", ClientsRequestController, except: [:new, :show]
     resources "/task", TaskController, except: [:new]
+
+
+    #export csv
+    get "/export" , CsvController , :download
+
   end
 
   # Other scopes may use custom stacks.

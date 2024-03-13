@@ -38,7 +38,31 @@ defmodule PmLoginWeb.Project.BoardLive do
         _ -> {}
       end
 
-    task_changeset = Monitoring.change_task(%Task{})
+     task_changeset =
+    case Monitoring.is_contributor?(curr_user_id) do
+      false ->
+         Monitoring.change_task_2(%Task{})
+       # secondary_changeset = Monitoring.change_task_2(%Task{})
+      true ->
+        Monitoring.change_task_contributor(%Task{})
+       # secondary_changeset = Monitoring.change_task_contributor(%Task{})
+
+    end
+    secondary_changeset =
+    case Monitoring.is_contributor?(curr_user_id) do
+      false ->
+        #task_changeset = Monitoring.change_task_2(%Task{})
+        Monitoring.change_task_2(%Task{})
+       true ->
+        #task_changeset = Monitoring.change_task_contributor(%Task{})
+        Monitoring.change_task_contributor(%Task{})
+    end
+    IO.puts " ****************************************************************** "
+    IO.inspect task_changeset
+    IO.puts "******************************************************************"
+    IO.inspect  Monitoring.is_contributor?(curr_user_id)
+
+
     modif_changeset = Monitoring.change_task(%Task{})
 
     priorities = Monitoring.list_priorities()
@@ -50,7 +74,7 @@ defmodule PmLoginWeb.Project.BoardLive do
     contributors = Login.list_contributors()
     list_contributors = Enum.map(contributors, fn %User{} = p -> {p.username, p.id} end)
 
-    secondary_changeset = Monitoring.change_task(%Task{})
+
     my_primary_tasks = Monitoring.list_primary_tasks(pro_id)
     list_primaries = my_primary_tasks |> Enum.map(fn %Task{} = p -> {p.title, p.id} end)
 
@@ -360,9 +384,11 @@ defmodule PmLoginWeb.Project.BoardLive do
       "task_id" => card.task.id,
       "intervener_id" => curr_user_id,
       "status_from_id" => card.task.status_id,
-      "status_to_id" => 0
+      "status_to_id" => 6
     }
-    Monitoring.update_task(card.task, %{"status_id" => 0})
+    #change the status to archived status
+    Monitoring.update_task(card.task, %{"status_id" => 6})
+
     Monitoring.create_task_history(attrs)
     # Monitoring.remove_card(card.task_id)
 
@@ -538,7 +564,47 @@ defmodule PmLoginWeb.Project.BoardLive do
   def handle_event("distinct_task", %{"_target" => ["task_view"]}, socket) do
     {:noreply, socket}
   end
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
 
+def handle_event("recherche_tache", %{"text" => text},socket) do
+  IO.puts "*********************recherche tache avec : " <>text
+  stages =
+  Kanban.get_board!(socket.assigns.board.id).stages
+  |> Enum.map(fn %Kanban.Stage{} = stage ->
+    struct(stage, cards: cards_list_searched(stage.cards, text))
+  end)
+
+  current_board = Kanban.get_board!(socket.assigns.board.id)
+  board = struct(current_board, stages: stages)
+
+  new_stages =
+    case socket.assigns.showing_primaries do
+      true ->
+        stages
+        |> Enum.map(fn %Kanban.Stage{} = stage ->
+          struct(stage, cards: cards_list_primary_tasks(stage.cards))
+      end)
+
+    _ ->
+      stages
+      |> Enum.map(fn %Kanban.Stage{} = stage ->
+        struct(stage, cards: cards_list_secondary_tasks(stage.cards))
+      end)
+    end
+  new_board = struct(board, stages: new_stages)
+  {:noreply,
+  socket
+  |> assign(board: new_board)}
+end
+
+
+
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
   def handle_event("search_task", %{"search-a" => text}, socket) do
     # IO.inspect(text)
 
@@ -1104,8 +1170,10 @@ defmodule PmLoginWeb.Project.BoardLive do
   end
 
   def handle_event("update_card", %{"card" => card_attrs}, socket) do
+    IO.puts "makato eeee"
+    IO.inspect card_attrs
     card = Kanban.get_card!(card_attrs["id"])
-    old_task = Monitoring.get_task!(card.task_id)
+    # old_task = Monitoring.get_task!(card.task_id)
     # IO.inspect card_attrs
     # IO.inspect updated_stage
     # IO.puts "before"
@@ -1158,6 +1226,7 @@ defmodule PmLoginWeb.Project.BoardLive do
           if show_reason_task_history_modal == false do
             new_attrs = Map.put(attrs_history,"reason","Aucun")
             Monitoring.create_task_history(new_attrs)
+            {:ok, real_task} = Monitoring.update_task_status(updated_task, task_attrs)
             {:noreply,
             socket
             |> push_event("AnimateAlert", %{})
@@ -1275,6 +1344,8 @@ defmodule PmLoginWeb.Project.BoardLive do
         # REMOVING CHILD TASK FROM ACHIEVED STAGE
         if Monitoring.is_a_child?(real_task) and Kanban.get_stage!(card.stage_id).status_id == 5 and
              real_task.status_id != 5 do
+
+          IO.puts "REFA INPNA N MAKATO LETI EEEEEEEE  ***************************************************************************"
           # IO.puts "CHILD:"
           # IO.inspect real_task
           # IO.puts " AVEC PARENT:"
@@ -1886,8 +1957,9 @@ defmodule PmLoginWeb.Project.BoardLive do
   end
 
   def handle_event("save", %{"task" => params}, socket) do
-    # IO.inspect params
-    # IO.inspect params["estimated_duration"]
+
+    IO.inspect params
+    IO.inspect params["estimated_duration"]
     # IO.puts("#{is_integer(params["estimated_duration"])}")
 
     hour = String.to_integer(params["hour"])
@@ -1907,6 +1979,7 @@ defmodule PmLoginWeb.Project.BoardLive do
 
     case Monitoring.create_task_with_card(new_params) do
       {:ok, task} ->
+        IO.inspect task
         this_board = socket.assigns.board
 
         this_project = socket.assigns.board.project
@@ -1945,6 +2018,7 @@ defmodule PmLoginWeb.Project.BoardLive do
          |> assign(show_task_modal: false)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
+        IO.inspect changeset
         {:noreply, assign(socket, task_changeset: changeset)}
     end
   end

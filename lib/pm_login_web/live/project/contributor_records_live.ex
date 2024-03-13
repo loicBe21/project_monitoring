@@ -5,7 +5,10 @@ defmodule PmLoginWeb.Project.ContributorRecordsLive do
   alias PmLogin.Monitoring.{Project, Task}
   alias PmLogin.Login
   alias PmLogin.Kanban
+  alias PmLogin.Pointages
   alias PmLoginWeb.LiveComponent.TaskModalFromRecordLive
+
+
 
   def mount(_params, %{"curr_user_id"=>curr_user_id}, socket) do
     Services.subscribe()
@@ -19,7 +22,12 @@ defmodule PmLoginWeb.Project.ContributorRecordsLive do
     my_projects = Monitoring.list_projects_by_contributor(curr_user_id)
     list_projects = Enum.map(my_projects, fn %Project{} = p -> {p.title, p.id} end)
 
-    my_actions = Monitoring.list_todays_task_records_by_user(curr_user_id)
+    #my_actions = Monitoring.list_todays_task_records_by_user(curr_user_id)
+    my_actions = Pointages.list_my_record_todays(curr_user_id)
+    launch_types = Pointages.get_lauch_types
+
+    #nampiko anito
+    current_task_id_in_record = Pointages.get_details_task_in_record(curr_user_id)
 
     {:ok,
        socket
@@ -34,7 +42,10 @@ defmodule PmLoginWeb.Project.ContributorRecordsLive do
                   my_actions: my_actions,
                   show_notif: false,
                   notifs: Services.list_my_notifications_with_limit(curr_user_id, 4),
-          show_task_modal: false, unachieved: Monitoring.list_my_near_unachieved_tasks(curr_user_id), past_unachieved: Monitoring.list_my_past_unachieved_tasks(curr_user_id)),
+                  launch_types: launch_types,
+                  current_task_id_in_record: current_task_id_in_record ,
+                  task_selected: nil ,
+          show_task_modal: false, show_lauch_modal: false , unachieved: Monitoring.list_my_near_unachieved_tasks(curr_user_id), past_unachieved: Monitoring.list_my_past_unachieved_tasks(curr_user_id)),
        layout: {PmLoginWeb.LayoutView, "contributor_board_live.html"}
        }
   end
@@ -246,10 +257,25 @@ defmodule PmLoginWeb.Project.ContributorRecordsLive do
     {:noreply, socket |> assign(user: put_user, my_tasks: Monitoring.list_tasks_by_contributor(socket.assigns.curr_user_id), my_actions: my_actions)}
   end
 
-  def handle_event("start-meeting", params, socket) do
-    IO.puts "MEETING"
-    {:noreply, socket}
+
+  def handle_event("stop_record_v2", %{"task_id" => task_id } , socket ) do
+    task_id_value =String.to_integer(task_id)
+    curr_user_id = socket.assigns.curr_user_id
+    Pointages.stop_record(task_id_value ,curr_user_id,4)
+    my_actions = Pointages.list_my_record_todays(curr_user_id)
+    {:noreply , socket|> assign(my_actions: my_actions , current_task_id_in_record: Pointages.get_details_task_in_record(curr_user_id))}
   end
+
+  def handle_event("start-meeting", _params, socket) do
+    IO.puts "MEETING"
+    {:noreply, socket |> assign(show_lauch_modal: true )}
+  end
+
+  #nampiko anito koaaaaa
+
+   def handle_event("stop_record_action" , %{"task_id" => task_id } , socket) do
+    {:noreply, socket |> assign(show_lauch_modal: true   , task_selected: task_id)}
+   end
 
   def handle_event("start-record", %{"task_id" => task_id}, socket) do
     curr_user_id = socket.assigns.curr_user_id
@@ -285,6 +311,35 @@ defmodule PmLoginWeb.Project.ContributorRecordsLive do
     my_actions = Monitoring.list_todays_task_records_by_user(socket.assigns.curr_user_id)
     {:noreply, socket |> assign(user: user, my_tasks: socket.assigns.my_tasks, my_actions: my_actions)}
   end
+
+  def handle_event("start_record_v2" , %{"task_id" => task_id}, socket) do
+     curr_user_id = socket.assigns.curr_user_id
+     Pointages.start_record(task_id , curr_user_id)
+     my_actions = Pointages.list_my_record_todays(curr_user_id)
+    {:noreply , socket|> assign(my_actions: my_actions , current_task_id_in_record: Pointages.get_details_task_in_record(curr_user_id))}
+  end
+
+  def handle_event("submit_stop_record" , %{"task_id" => task_id , "launch_id" => launch_id} , socket) do
+    task_id_value =String.to_integer(task_id)
+    curr_user_id = socket.assigns.curr_user_id
+    launch_id_value = String.to_integer(launch_id)
+    Pointages.stop_record(task_id_value ,curr_user_id,launch_id_value)
+    my_actions = Pointages.list_my_record_todays(curr_user_id)
+    {:noreply , socket|> assign(my_actions: my_actions , current_task_id_in_record: Pointages.get_details_task_in_record(curr_user_id) ,show_lauch_modal: false , task_selected: nil)}
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   def handle_event("load-notifs", %{}, socket) do
     curr_user_id = socket.assigns.curr_user_id

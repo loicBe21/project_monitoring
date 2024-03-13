@@ -59,7 +59,7 @@ defmodule PmLogin.Monitoring do
   def create_task_record(attrs \\ %{}) do
     %TaskRecord{}
     |> TaskRecord.create_changeset(attrs)
-    |> Repo.insert()
+    |> Repo.update()
   end
 
   def change_task_record(%TaskRecord{} = task_record, attrs \\ %{}) do
@@ -86,7 +86,7 @@ defmodule PmLogin.Monitoring do
   end
 
   def filter_task_title(text, title) do
-    Regex.match?(~r/^#{text}/i, title)
+    Regex.match?(~r/#{text}/i, title)
   end
 
   # DATE CALCULUS
@@ -2702,6 +2702,14 @@ defmodule PmLogin.Monitoring do
     Task.changeset(task, attrs)
   end
 
+  def change_task_2(%Task{} = task, attrs \\ %{}) do
+    Task.changeset_2(task, attrs)
+  end
+
+  def change_task_contributor(%Task{} =  task , attrs \\ %{}) do
+    Task.changeset_contributor_task_non_valided(task , attrs)
+  end
+
   alias PmLogin.Monitoring.Comment
 
   @doc """
@@ -3382,5 +3390,67 @@ defmodule PmLogin.Monitoring do
       where: c.task_id == ^id
     Repo.one(query)
   end
+
+
+
+  # count task in stage exclude archived task
+  def count_task_in_stage_without_archived_status(stage) do
+      count_result =  Enum.count(stage.cards  , fn card -> card.task.status_id != 6 end)
+      count_result
+  end
+
+
+  #get invalid tache
+  def get_invalid_tasks do
+    contributor_query = from(contributor in User)
+    status_query = from(status in Status)
+    project_query = from(project in Project)
+
+    query =  from t in Task ,
+      preload: [contributor: ^contributor_query, status: ^status_query , project: ^project_query ],
+      where: t.is_valid == false
+    Repo.all(query)
+  end
+
+
+  defp validate_task_status_changeset(task , user_id) do
+    Task.update_task_validation(task ,  %{"attributor_id" => user_id })
+  end
+
+
+  def validate_tsak(task_id ,  user_id) do
+
+    case get_task!(task_id) do
+      task ->
+        case is_attributor?(user_id) do
+          true ->
+            validation_changeset = validate_task_status_changeset(task , user_id)
+            Repo.update(validation_changeset)
+
+            {:ok ,  task}
+          false
+              ->{:error ,  "droit non autorisé"}
+        end
+      _ ->
+        {:error  , "tache non trouvé"}
+
+    end
+  end
+
+
+  def get_my_task_active(user_id) do
+    contributor_query = from(contributor in User)
+    status_query = from(status in Status)
+    project_query = from(project in Project)
+
+    query =  from t in Task ,
+      preload: [contributor: ^contributor_query, status: ^status_query , project: ^project_query ],
+      where: t.status_id != 5 and t.status_id != 6 and t.contributor_id == ^user_id
+
+    Repo.all(query)
+  end
+
+
+  #PmLogin.Monitoring.get_my_task_active(129)
 
 end

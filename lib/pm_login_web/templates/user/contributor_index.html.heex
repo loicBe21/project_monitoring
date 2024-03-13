@@ -1,57 +1,53 @@
 <!-- <h1>Bienvenue contributeur, <%= @current_user.username %></h1> -->
 
-<div class="row" style="margin-top: 50px;">
+<div class="row" style="margin-top: 20px;">
   <a href={Routes.contributor_path(@socket, :my_projects)} class="column">
     <div class="card-style">
-      <img 
-        class="image-fit-cover" 
-        src={ Routes.static_path(@socket, "/images/1.jpg" )} 
+      <img
+        class="image-fit-cover"
+        src={ Routes.static_path(@socket, "/images/1.jpg" )}
       />
       <div style="padding: 20px;">
-        <span class="material-icons mat__ico">insert_chart</span>
-        <p>Mes projets</p>
+        <p style="margin: 0 0 0 0" >Mes projets</p>
       </div>
     </div>
   </a>
-  <a href={Routes.contributor_path(@socket, :my_records)} class="column">
+  <a href={Routes.saisie_temps_path(@socket, :index_saisie , date: Utilities.parse_date_to_html(Date.utc_today()))} class="column" target="_blank">
     <div class="card-style">
-      <img 
-        class="image-fit-cover" 
-        src={ Routes.static_path(@socket, "/images/14.jpg" )} 
+      <img
+        class="image-fit-cover"
+        src={ Routes.static_path(@socket, "/images/14.jpg" )}
       />
       <div style="padding: 20px;">
-        <span class="material-icons mat__ico">insert_chart</span>
-        <p>Pointage</p>
+        <p style="margin: 0 0 0 0">Saisie de temps</p>
       </div>
     </div>
   </a>
   <a href={Routes.contributor_path(@socket, :my_tasks)} class="column">
     <div class="card-style">
-      <img 
-        class="image-fit-cover" 
-        src={ Routes.static_path(@socket, "/images/9.jpg" )} 
+      <img
+        class="image-fit-cover"
+        src={ Routes.static_path(@socket, "/images/9.jpg" )}
       />
       <div style="padding: 20px;">
-        <span class="material-icons mat__ico">format_list_bulleted</span>
-        <p>Mes tâches</p>
+        <p style="margin: 0 0 0 0">Mes tâches</p>
       </div>
     </div>
   </a>
   <a href={Routes.user_path(@socket, :show, @curr_user_id)} class="column">
     <div class="card-style">
-      <img 
-        class="image-fit-cover" 
-        src={ Routes.static_path(@socket, "/images/4.jpg" )} 
+      <img
+        class="image-fit-cover"
+        src={ Routes.static_path(@socket, "/images/4.jpg" )}
       />
       <div style="padding: 20px;">
-        <span class="material-icons mat__ico">account_circle</span>
-        <p>Mon profil</p>
+        <p style="margin: 0 0 0 0">Mon profil</p>
       </div>
     </div>
   </a>
 </div>
 
-<h4 style="text-align: center; margin-top: 15px">Mes tâches inachevées ayant une date d'échéance proche</h4>
+<h4 style="text-align: center; margin-top: -15px">Mes tâches inachevées ayant une date d'échéance proche</h4>
 
 <%= if @unachieved == [] do %>
   <div class="alert-primary" role="alert">
@@ -175,7 +171,7 @@
       <table class="table-tasks-unachieved" id="" style="font-size: 12px; padding: 0px 0px 0px 10px;">
         <tbody>
           <%= for task <- @past_unachieved do %>
-            <%= if task.status_id != 5 and task.hidden != true do %>
+            <%= if task.status_id !=6 and  (task.status_id != 5 and task.hidden != true) do %>
               <tr>
                 <%= cond do %>
                 <% length(@past_unachieved) <= 0 -> %>
@@ -252,7 +248,7 @@
 <!-- <br>
 <h2>Mes tâches inachevées ayant une date d'échéance proche</h2>
 <%= cond do %>
-  <% length(@unachieved) <= 0 -> %> 
+  <% length(@unachieved) <= 0 -> %>
     <p class="my_alert alert-info none_alert">Aucune</p>
   <% true -> %>
     <%= for task <- @unachieved do %>

@@ -2,6 +2,29 @@
 // Remove this line if you add a your own CSS build pipeline (e.g postcss).
 import "../css/app.css";
 
+import "./BoardControle.js";
+
+/*
+import 'tom-select'
+import TomSelect from "tom-select";
+
+var test =
+
+
+
+
+
+  new TomSelect('#select-person');
+
+
+
+
+console.log(test);
+*/
+
+
+//import "./table_saisie_temp_controle.js"
+
 // If you want to use Phoenix channels, run `mix help phx.gen.channel`
 // to get started and then uncomment the line below.
 // import "./user_socket.js"
@@ -41,6 +64,7 @@ import {
 } from "./chart.js";
 import chart from "chart.js/dist/chart";
 
+
 const Hooks = {};
 
 // Hooks.DoughNutChart = {
@@ -49,6 +73,66 @@ const Hooks = {};
 //     this.chart = new DoughNutChart(this.el, labels_tasks_by_contributors, values_tasks_by_contributors)
 //   }
 // }
+
+Hooks.TomSelectHook = {
+  mounted() {
+    const selectElement = this.el;
+    const tomSelect = new TomSelect(selectElement, {
+     
+      searchable: true,
+      sortField: {
+        field: "text",
+        direction: "asc"
+      }
+    });
+  }
+}
+
+Hooks.CsvExportHook = {
+  mounted() {
+    this.handleExportClick = this.handleExportClick.bind(this);
+    this.el.addEventListener("click", this.handleExportClick);
+  },
+  destroyed() {
+    this.el.removeEventListener("click", this.handleExportClick);
+  },
+
+ 
+
+
+  handleExportClick(event) {
+
+  
+
+  
+
+    let csvData = this.el.getAttribute("data-csv");
+    console.log("avant :" ,csvData)
+    csvData = csvData.replace(/\\r\\n/g, '\n')
+    //let test = "Name,Age,City\nJohn,30,New York\nJane,25,San Francisco\nBob,35,Chicago";
+    console.log ("apres :" ,csvData)
+    // Créer un objet Blob à partir de la chaîne CSV
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+
+    // Créer un élément <a> pour télécharger le fichier CSV
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'exemple.csv';
+
+    // Ajouter l'élément <a> à la page
+    document.body.appendChild(link);
+
+    // Simuler un clic sur le lien pour déclencher le téléchargement
+    link.click();
+
+    // Supprimer l'élément <a> après le téléchargement
+    document.body.removeChild(link);
+
+    // ... Autres actions à effectuer avec csvData ...
+  },
+
+
+};
 
 Hooks.HorizontalBarChart = {
   mounted() {
@@ -300,7 +384,13 @@ navToggle.addEventListener("click", function () {
     this.setAttribute("aria-expanded", "true");
   }
 });
+ // Récupérez l'élément par son ID
+ var copyrightIcon = document.getElementById('copyright__icon');
 
+ // Vérifiez si l'élément a été trouvé avant de le modifier
+ if (copyrightIcon) {
+     copyrightIcon.innerHTML = 'copyright PHIDIA / Project monitoring -2024';
+ }
 const menuBtn = document.querySelector(".menu-btn");
 let menuOpen = false;
 menuBtn.addEventListener("click", () => {
@@ -346,3 +436,4 @@ liveSocket.connect();
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket;
+

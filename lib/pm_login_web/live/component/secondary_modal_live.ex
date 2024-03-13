@@ -61,7 +61,7 @@ defmodule PmLoginWeb.LiveComponent.SecondaryModalLive do
                       <div style="margin-top: 9px;">
                         h
                       </div>
-                      <input id="task_estimated_duration_minutes" name="task[minutes]" type="number" min="0" max="60" placeholder="Minutes" style="margin-right: 10px; margin-left: 10px;" required/>
+                      <input id="task_estimated_duration_minutes" name="task[minutes]" type="number" min="0" max="60" value="00" placeholder="Minutes" style="margin-right: 10px; margin-left: 10px;" required/>
                       <div style="margin-top: 9px;">
                         m
                       </div>
@@ -75,15 +75,18 @@ defmodule PmLoginWeb.LiveComponent.SecondaryModalLive do
 
                   <div class="row">
                     <div class="column">
+                      <label class="zoom-out">Date du début</label>
+                      <%= date_input f, :date_start %>
                       <label class="zoom-out">Date d'échéance</label>
                       <%= date_input f, :deadline %>
+
                       <div class="zoom-out">
                         <%= error_tag f, :deadline %>
                         <%= error_tag f, :deadline_lt %>
                         <%= error_tag f, :deadline_before_dtstart %>
                       </div>
                     </div>
-
+                    <%= hidden_input f , :is_valid %>
                     <div class="column">
                       <%= if (@is_attributor == true or @is_admin == true) do %>
                         <label class="zoom-out">Assigner intervenant</label>

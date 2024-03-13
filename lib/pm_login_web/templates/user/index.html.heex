@@ -20,9 +20,8 @@
 
       </form>
     </div>
-
-    <div class="my_col">
-      <!-- <b style="position: relative; top: 8px;"></b> -->
+    <!--<div class="my_col">
+      <b style="position: relative; top: 8px;"></b>
       <span class="material-icons-round sort__icon filt__and__sort__ico">sort_by_alpha</span>
       <form phx-change="sort_users">
 
@@ -33,8 +32,7 @@
         </select>
 
       </form>
-    </div>
-
+    </div>-->
     <div class="my_col">
       <form phx-change="search-user">
           <input type="text" name="search-a" placeholder="Rechercher par nom" style="width: 150px;">
@@ -45,18 +43,14 @@
     <div phx-click="show-form" class="button">
       <i class="bi bi-plus-circle"></i> Créer utilisateur
     </div>
-    
-
-
-
   </div>
   <table class="table-list-users">
     <thead>
       <tr>
         <th></th>
-        <th><span class="material-icons-round arr__sorted" phx-click="sorted_by_username"><%= if not @sorted_by_username do "keyboard_arrow_down" else "keyboard_arrow_right" end %></span>Nom d'utilisateur</th>
-        <th><span class="material-icons-round arr__sorted" phx-click="sorted_by_email"><%= if not @sorted_by_email do "keyboard_arrow_down" else "keyboard_arrow_right" end %></span> Email</th>
-        <th><span class="material-icons-round arr__sorted" phx-click="sorted_by_status"><%= if not @sorted_by_status do "keyboard_arrow_down" else "keyboard_arrow_right" end %></span> Statut</th>
+        <th><span class="material-icons-round arr__sorted" phx-click="sorted_by_username"><%= if not @sorted_by_username do "keyboard_arrow_down" else "keyboard_arrow_up" end %></span>Nom d'utilisateur</th>
+        <th><span class="material-icons-round arr__sorted" phx-click="sorted_by_email"><%= if not @sorted_by_email do "keyboard_arrow_down" else "keyboard_arrow_up" end %></span> Email</th>
+        <th><span class="material-icons-round arr__sorted" phx-click="sorted_by_status"><%= if not @sorted_by_status do "keyboard_arrow_down" else "keyboard_arrow_up" end %></span> Statut</th>
 
         <th>Actions</th>
       </tr>
@@ -64,8 +58,8 @@
     <tbody>
       <%= for user <- @users do %>
       <tr>
-        <td data-label="">
-            <img class="profile-pic-mini" src={ Routes.static_path(@socket, "/#{user.profile_picture}") } width="50"/>
+        <td data-label="">         
+          <img class="profile-pic-mini" src={ Routes.static_path(@socket, "/profile_pic/#{user.profile_picture}") } width="50"/>
         </td>
 
         <td data-label="Nom"><%= user.username %></td>

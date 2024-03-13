@@ -22,7 +22,8 @@ defmodule PmLogin.Application do
       # {PmLogin.Worker, arg}
       PmLogin.SpawnerSupervisor,
       PmLogin.SpawnerLauncher,
-
+      #saisie server
+      PmLogin.SaisieServer,
       # Send automatic email when task must be controlled
       PmLogin.TaskMailMonitor
     ]

@@ -57,7 +57,7 @@
             <div class="dropdown">
               <li class="dropbtn nav__item__link" style="margin-top: -4px">
                 <a class="nav__item__link">
-                  <span class="material-icons mat__ico">format_list_bulleted</span> <p>Mes tâches</p> 
+                  <span class="material-icons mat__ico">format_list_bulleted</span> <p>Mes tâches</p>
                 </a>
               </li>
               <div class="dropdown-content">
@@ -69,7 +69,7 @@
                   <a href={Routes.project_path(@socket, :attributed_tasks)} class="nav__item__link" style="margin-top: 4px">
                     <i class="bi bi-person-plus" style="font-size: 15px"></i>
                     <p>Les tâches attribuées</p>
-                    
+
                   </a>
                 </li>
               </div>
@@ -115,7 +115,7 @@
             <li class="nav__item">
               <div class="dropdown">
                 <a href={ Routes.user_path(@socket, :show, @curr_user_id) } class="nav__item__link">
-                <img class="profile-pic-header" src={Routes.static_path(@socket, "/#{PmLogin.Login.get_profile_picture(@curr_user_id) }")} width="50" style="position: relative;top: 5px;"/>
+                <img class="profile-pic-header" src={Routes.static_path(@socket, "/profile_pic/#{PmLogin.Login.get_profile_picture(@curr_user_id) }")} width="50" style="position: relative;top: 5px;"/>
                 <p><%= PmLogin.Login.get_user!(@curr_user_id).username %></p></a>
                 <div class="dropdown-content">
                   <a href={ Routes.user_path(@socket, :show, @curr_user_id) } class="admin__links" style="display: flex;justify-content: space-between;">
@@ -150,8 +150,6 @@
         phx-click="lv:clear-flash"
         phx-value-key="error"><%= live_flash(@flash, :error) %></p>
       <%= @inner_content %>
-      <br/>
-      <br/>
 
       <!--
       <span>
@@ -163,7 +161,7 @@
   </body>
   <footer id="foot" class="container-fluid">
     <div id="footcont" class="container">
-      <p><span id="copyright__icon" class="material-icons">copyright</span>copyright PHIDIA / Project monitoring</p>
+      <p><span id="copyright__icon" class="material-icons">copyright</span>copyright PHIDIA / Project monitoring - 2024</p>
     </div>
 
   </footer>

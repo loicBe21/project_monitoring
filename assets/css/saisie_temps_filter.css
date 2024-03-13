@@ -1,0 +1,16 @@
+.saisie_temps_menu {
+    display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        /* Aligner les éléments verticalement */
+}
+
+.saisie_temps_menu .centered_content {
+    text-align: center;
+}
+
+.saisie_temps_menu .centered_content:hover {
+    background-color: #f0f0f0;
+    /* Changer la couleur de fond au survol */
+}

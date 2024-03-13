@@ -24,10 +24,10 @@
      <!-- Task Card BEGIN -->
     <div class="content_tables">
       <div class="icon-card table-card-style" style="padding-top: 0; padding-bottom: 0;">
-        <div 
+        <div
           style="
-            max-height: 600px; 
-            overflow: auto; 
+            max-height: 600px;
+            overflow: auto;
             padding-right: 30px;
             width: -webkit-fill-available;
             width: -moz-available;"
@@ -41,15 +41,15 @@
         </div>
           <table style="font-size: 1.2rem">
             <tbody>
-              <tr 
+              <tr
                 style="
                   position: sticky;
                   top: 0;
                   background: #fff;
                 "
               >
-                <td colspan="4" style="border:none;position:relative;"> 
-                  <form action="#" phx-submit="filter_by_date">  
+                <td colspan="4" style="border:none;position:relative;">
+                  <form action="#" phx-submit="filter_by_date">
                     <div style="display:flex; height:100px;align-items:center;">
                       <div class="datedebut" style="width:auto;display:flex;margin-top:50px;align-items:center">
                         <label style="width:180px;">Date début : </label>
@@ -85,11 +85,9 @@
                     </select>
                   </form>
                 </td>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
-                <td style="border: none;"></td>
+                <td><button id="export-csv" phx-click="export-csv" phx-hook="CsvExportHook"  data-csv={Jason.encode!(@export)}>Export CSV</button></td>
+
+
               </tr>
 
               <tr

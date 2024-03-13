@@ -1,12 +1,12 @@
 
-<div class="row" style="margin-top: 50px; padding: 0">
-  <div class="row">
+<div class="row" style="margin-top: 20px;padding: 0;display: flex;justify-content: space-around;">
+  <div class="row" style="width:76%">
       <a href={Routes.project_path(@socket, :index)}
       class="column" style="padding: 0">
       <div class="card-style">
-        <img 
+        <img
           class="image-fit-cover"
-          src={ Routes.static_path(@socket, "/images/1.jpg" )} 
+          src={ Routes.static_path(@socket, "/images/1.jpg" )}
         />
         <div style="padding: 20px;">
           <p style="margin: 0 0 0 0">Mes projets</p>
@@ -15,9 +15,9 @@
     </a>
     <a href={Routes.project_path(@socket, :tasks)} class="column" style="padding: 0">
       <div class="card-style">
-        <img 
-          class="image-fit-cover" 
-          src={ Routes.static_path(@socket, "/images/9.jpg" )} 
+        <img
+          class="image-fit-cover"
+          src={ Routes.static_path(@socket, "/images/9.jpg" )}
         />
         <div style="padding: 20px;">
           <p style="margin: 0 0 0 0">Mes tâches</p>
@@ -26,12 +26,23 @@
     </a>
     <a href={Routes.project_path(@socket, :attributed_tasks)} class="column" style="padding: 0">
       <div class="card-style">
-        <img 
-          class="image-fit-cover" 
-          src={ Routes.static_path(@socket, "/images/10.jpg" )} 
+        <img
+          class="image-fit-cover"
+          src={ Routes.static_path(@socket, "/images/10.jpg" )}
         />
         <div style="padding: 20px;">
           <p style="margin: 0 0 0 0">Mes attributions</p>
+        </div>
+      </div>
+    </a>
+    <a href={Routes.saisie_temps_path(@socket, :index_saisie , date: Utilities.parse_date_to_html(Date.utc_today()))} class="column" target="_blank">
+      <div class="card-style">
+        <img
+          class="image-fit-cover"
+          src={ Routes.static_path(@socket, "/images/14.jpg" )}
+        />
+        <div style="padding: 20px;">
+          <p style="margin: 0 0 0 0">Saisie de temps</p>
         </div>
       </div>
     </a>
@@ -40,24 +51,25 @@
 
 </div>
 
-<div class="row" style="padding: 0">
+<div class="row" style="margin-top: -30px;padding: 0;display: flex;justify-content: space-around;">
+<div class="row conteneur_bas" style="width:76%">
   <a href={Routes.project_path(@socket, :contributors)} class="column" style="padding: 0">
     <div class="card-style">
-      <img 
-        class="image-fit-cover" 
-        src={ Routes.static_path(@socket, "/images/8.jpg" )} 
+      <img
+        class="image-fit-cover"
+        src={ Routes.static_path(@socket, "/images/8.jpg" )}
       />
-      <div style="padding: 20px;">
-        <p style="margin: 0 0 0 0">Listes des Contributeurs</p>
+      <div style="padding: 20 0 20 0;">
+        <p style="margin: 0 0 0 0">Nos Contributeurs</p>
       </div>
     </div>
   </a>
 
   <a href={Routes.user_path(@socket, :show, @curr_user_id)} class="column" style="padding: 0">
     <div class="card-style">
-      <img 
-        class="image-fit-cover" 
-        src={ Routes.static_path(@socket, "/images/4.jpg" )} 
+      <img
+        class="image-fit-cover"
+        src={ Routes.static_path(@socket, "/images/4.jpg" )}
       />
       <div style="padding: 20px;">
         <p style="margin: 0 0 0 0">Mon profil</p>
@@ -65,16 +77,27 @@
     </div>
   </a>
 
-  <a href={Routes.project_path(@socket, :logs)} class="column">
+  <a href={Routes.project_path(@socket, :logs)} class="column" style="padding: 0">
     <div class="card-style">
-      <img 
+      <img
         class="image-fit-cover"
         src={ Routes.static_path(@socket, "/images/13.jpg" )}
       />
-      <div style="padding: 20px; display: block ruby">
-        <span class="material-icons mat__ico">stacked_line_chart</span>
-        <p style="margin-top: revert;">Tableau de bord</p>
+      <div style="padding: 20px;">
+        <p style="margin: 0 0 0 0">Tableau de bord</p>
       </div>
     </div>
   </a>
+  <a href={Routes.task_path(@socket, :task_need_validation, @curr_user_id)} class="column" style="padding: 0; display:none;">
+    <div class="card-style">
+      <img
+        class="image-fit-cover"
+        src={ Routes.static_path(@socket, "/images/13.jpg" )}
+      />
+      <div style="padding: 20px;">
+        <p style="margin: 0 0 0 0">Validation de taches</p>
+      </div>
+    </div>
+  </a>
+   </div>
 </div>

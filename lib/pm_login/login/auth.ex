@@ -9,6 +9,7 @@ defmodule PmLogin.Login.Auth do
     field :username, :string
     field :profile_picture, :string
     field :email, :string
+    field :phone_number, :string
     field :right_id, :id
     field :title, :string
   end

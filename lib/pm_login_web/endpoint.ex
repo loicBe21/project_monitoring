@@ -24,7 +24,9 @@ defmodule PmLoginWeb.Endpoint do
     at: "/",
     from: :pm_login,
     gzip: false,
-    only: ~w(assets fonts images js favicon.ico robots.txt uploads)
+    only: ~w(assets fonts images js favicon.ico robots.txt uploads profile_pic)
+
+
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -45,10 +47,15 @@ defmodule PmLoginWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Phoenix.json_library()
+    json_decoder: Phoenix.json_library(),
+    length: 5_000_000  # 5 Mo en octets
+
+
 
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
   plug PmLoginWeb.Router
+
+
 end

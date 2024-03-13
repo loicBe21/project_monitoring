@@ -1,0 +1,110 @@
+.board-menu-conteneur{
+    display: flex;
+    width: 100%;
+    height:auto;
+    justify-content: space-between;
+}
+
+.board-menu-conteneur .board-pourcentage{
+    display: flex;
+    align-items: center;
+
+}
+
+.board-menu-controlle{
+    display: flex;
+    width: 100%;
+    height:50px;
+    justify-content: space-around;
+}
+
+.board-menu-controlle #controlle_de_taches form{
+    margin-top: 7px;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.board-menu-controlle #controlle_de_recherche {
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+    position: relative;
+}
+
+#suggestions-conteneur {
+    background-color: white;
+    width: 120%;
+    overflow-y: auto;
+    overflow-x: auto;
+    position: absolute;
+    padding: 5px;
+    top: 100%;  
+    z-index: 1000;
+}
+#suggestions-conteneur div{
+    font-size: 13px;
+    border-bottom: 1px solid  #5e555e;
+}
+#suggestions-conteneur div:hover{
+    background-color: rgb(74, 64, 109);
+    color:white;
+    cursor: pointer;
+}
+
+#historique_conteneur{
+    height: 75vh;
+    overflow-y: auto;
+    float :left;
+    transition: 0.2s ;
+    background-color:whitesmoke;
+    border: 2px solid #898888; 
+    border-radius: 7px;
+}
+#toggleButton_historique {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    font-size : 13px;
+    color:white;
+    padding: 5px;
+    background-color: #006ea5;
+    border-radius: 4px;
+    text-transform: lowercase;
+    margin-left: 10px;
+}#toggleButton_historique:hover {
+   cursor :pointer;
+}
+.historique_titre{
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 2px solid #000; 
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+.historique_card_conteneur{
+    padding: 5px;
+    border-radius: 7px;
+    margin-bottom: 5px;
+    border: 1px solid #3b3b3b; 
+    background-color: rgb(236, 236, 236);
+}
+
+@media only screen and (max-width: 1050px) {
+    /* Ajoutez ici les styles pour les écrans de largeur inférieure à 1050px */
+    .card-button,#controlle_de_taches,#toggleButton_historique{
+        font-size: 10px !important;
+        transition: 0.5s;
+    }
+    #recherche-input{
+        max-width: 120px;
+    }
+    .card-button{
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    .board-menu-controlle{
+        justify-content: flex-start;
+    }
+
+}

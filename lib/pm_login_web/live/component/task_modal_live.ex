@@ -49,12 +49,14 @@ defmodule PmLoginWeb.LiveComponent.TaskModalLive do
                     </div>
                     <%= hidden_input f, :project_id, value: @pro_id %>
                     <%= hidden_input f, :attributor_id, value: @curr_user_id %>
+
                   </div>
 
                   <div class="column">
                     <label class="zoom-out">Description</label>
                     <div class="zoom-out">
-                      <textarea id="task_description" name="task[description]"> </textarea>
+                      <!--<textarea id="task_description" name="task[description]" value=""> </textarea>!-->
+                      <%= textarea f, :description %>
                       <%= error_tag f, :description %>
                     </div>
                   </div>
@@ -66,7 +68,7 @@ defmodule PmLoginWeb.LiveComponent.TaskModalLive do
                       <div style="margin-top: 9px;">
                         h
                       </div>
-                      <input id="task_estimated_duration_minutes" name="task[minutes]" type="number" min="0" max="60" placeholder="Minutes" style="margin-right: 10px; margin-left: 10px;" required/>
+                      <input id="task_estimated_duration_minutes" name="task[minutes]" type="number" min="00" max="60" value='00' placeholder="Minutes" style="margin-right: 10px; margin-left: 10px;" required/>
                       <div style="margin-top: 9px;">
                         m
                       </div>
@@ -80,8 +82,11 @@ defmodule PmLoginWeb.LiveComponent.TaskModalLive do
                   <div class="row">
 
                     <div class="column">
+                      <label class="zoom-out">Date du début</label>
+                      <%= date_input f, :date_start %>
                       <label class="zoom-out">Date d'écheance</label>
                       <%= date_input f, :deadline %>
+                      <%= hidden_input f , :is_valid %>
                       <div class="zoom-out">
                         <%= error_tag f, :deadline %>
                         <%= error_tag f, :deadline_lt %>

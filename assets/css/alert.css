@@ -55,7 +55,7 @@
   color: #ffffff;
   cursor: pointer;
   display: inline-flex;
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Arial';
   font-size: 12px;
   font-weight: 600;
   justify-content: center;
@@ -78,7 +78,7 @@
 }
 
 .card-button {
-  background-color: #0284C7;
+  background-color: #006ea5;
 }
 
 .card-button-green {

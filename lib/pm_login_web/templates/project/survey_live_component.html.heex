@@ -1,12 +1,12 @@
 <style>
     textarea {
-        font-family: 'Manrope' !important;
+        font-family: 'Arial' !important;
         color: #3c3737 !important;
         /* Mettre à la ligne si le texte dépasse la box */
         overflow-wrap: break-word;
     }
-    
-    
+
+
     /*====== Breakpoints for Survey modal ======*/
     @media (max-width: 1200px) {
         .modal-card-task {
@@ -26,7 +26,7 @@
         }
     }
     /*====== End of Breakpoints for Survey modal ======*/
-    
+
 </style>
 
 <div class="modal-container">
@@ -44,13 +44,13 @@
                 <!---------------------- Request Informations ------------------------>
                 <div style="text-align: center; font-size: 1.25rem; margin: 1rem 0 1rem 0">
                     <div>
-                        <strong>Demande: </strong> N°<%= @request.uuid %> 
+                        <strong>Demande: </strong> N°<%= @request.uuid %>
                     </div>
                     <div>
                         <strong>Titre:</strong> <%= @request.title %>
                     </div>
                     <div>
-                        <strong>Date de création: </strong> <%= @request.date_post %> 
+                        <strong>Date de création: </strong> <%= @request.date_post %>
                     </div>
                     <div>
                         <strong>Date de finition:</strong> <%= @request.date_done %>
@@ -67,7 +67,7 @@
                         <div class="row">
                             <div class="column">
                                 <label class="zoom-out">La solution mise en place a t-il répondu à votre demande ?</label>
-                                <select id="createdTools" 
+                                <select id="createdTools"
                                         name="created_tools"
                                         style="width: -webkit-fill-available; width: -moz-available; height: 38px;"
                                 >
@@ -76,30 +76,30 @@
                                     <option value="-1" selected={@is_selected_created_tools}>Non</option>
                                 </select>
                             </div>
-    
+
                             <%= if @is_selected_created_tools do %>
                                 <!---------------- Comments -------------------->
                                 <div class="column">
                                     <label class="zoom-out">Commentaires</label>
-                                    <textarea style="resize: none;" 
-                                              name="client_comments_created_tools" 
-                                              id="clientCommentsCreatedTools" 
-                                              cols="30" 
+                                    <textarea style="resize: none;"
+                                              name="client_comments_created_tools"
+                                              id="clientCommentsCreatedTools"
+                                              cols="30"
                                               rows="10"
                                               required
                                     ><%= @client_comments_created_tools %></textarea>
                                 </div>
                             <% end %>
                         </div>
-                      
-                        
+
+
                         <!----------------- End One ------------------->
 
                         <!------------------ Two ---------------------->
                         <div class="row">
                             <div class="column">
                                 <label class="zoom-out">La solution mise en place vous a-t-elle permis de gagner du temps ?</label>
-                                <select id="timeSaved" 
+                                <select id="timeSaved"
                                         name="time_saved"
                                         style="width: -webkit-fill-available; width: -moz-available; height: 38px;"
                                 >
@@ -108,29 +108,29 @@
                                     <option value="-1" selected={@is_selected_time_saved}>Non</option>
                                 </select>
                             </div>
-    
+
                             <%= if @is_selected_time_saved do %>
                                 <!---------------- Comments -------------------->
                                 <div class="column">
                                     <label class="zoom-out">Commentaires</label>
-                                    <textarea style="resize: none;" 
-                                              name="client_comments_time_saved" 
-                                              id="clientCommentsTimeSaved" 
-                                              cols="30" 
+                                    <textarea style="resize: none;"
+                                              name="client_comments_time_saved"
+                                              id="clientCommentsTimeSaved"
+                                              cols="30"
                                               rows="10"
                                               required
                                     ><%= @client_comments_time_saved %></textarea>
                                 </div>
                             <% end %>
                         </div>
-                       
+
                         <!----------------- End Two ------------------->
 
                         <!------------------ Three ---------------------->
                         <div class="row">
                             <div class="column">
                                 <label class="zoom-out">Le délai communiqué par nos équipes est-il respecté ?</label>
-                                <select id="deadlineCommunicated" 
+                                <select id="deadlineCommunicated"
                                         name="deadline_communicated"
                                         style="width: -webkit-fill-available; width: -moz-available; height: 38px;"
                                 >
@@ -139,29 +139,29 @@
                                     <option value="-1" selected={@is_selected_deadline_commmunicated}>Non</option>
                                 </select>
                             </div>
-    
+
                             <%= if @is_selected_deadline_commmunicated do %>
                                 <!---------------- Comments -------------------->
                                 <div class="column">
                                     <label class="zoom-out">Commentaires</label>
-                                    <textarea style="resize: none;" 
-                                              name="client_comments_deadline_commmunicated" 
-                                              id="clientCommentsDeadlineCommunicated" 
-                                              cols="30" 
+                                    <textarea style="resize: none;"
+                                              name="client_comments_deadline_commmunicated"
+                                              id="clientCommentsDeadlineCommunicated"
+                                              cols="30"
                                               rows="10"
                                               required
                                     ><%= @client_comments_deadline_commmunicated %></textarea>
                                 </div>
                             <% end %>
                         </div>
-                        
+
                         <!----------------- End Three ------------------->
 
                         <!------------------ Four ---------------------->
                         <div class="row">
                             <div class="column">
                                 <label class="zoom-out">Est-ce que l'équipe a bien repondu à toutes vos questions ?</label>
-                                <select id="teamResponse" 
+                                <select id="teamResponse"
                                         name="team_response"
                                         style="width: -webkit-fill-available; width: -moz-available; height: 38px;"
                                 >
@@ -170,22 +170,22 @@
                                     <option value="-1" selected={@is_selected_team_response}>Non</option>
                                 </select>
                             </div>
-    
+
                             <%= if @is_selected_team_response do %>
                                 <!---------------- Comments -------------------->
                                 <div class="column">
                                     <label class="zoom-out">Commentaires</label>
-                                    <textarea style="resize: none;" 
-                                              name="client_comments_team_response" 
-                                              id="clientCommentsTeamResponse" 
-                                              cols="30" 
+                                    <textarea style="resize: none;"
+                                              name="client_comments_team_response"
+                                              id="clientCommentsTeamResponse"
+                                              cols="30"
                                               rows="10"
                                               required
                                     ><%= @client_comments_team_response %></textarea>
                                 </div>
                             <% end %>
                         </div>
-                     
+
                         <!----------------- End Four ------------------->
 
                         <!------------------ Buttons ---------------------->

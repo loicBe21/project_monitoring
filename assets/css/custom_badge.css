@@ -1,0 +1,45 @@
+  .badge {
+      display: inline-block;
+      padding: 0.35em 0.65em;
+      font-size: 0.75em;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: baseline;
+      border-radius: 0.25rem;
+  }
+
+  .badge-cell {
+      text-align: center;
+      /* Aligner le texte au centre horizontalement */
+      vertical-align: middle;
+      /* Aligner le contenu au centre verticalement */
+  }
+
+  .badge-orange {
+      color: #fff;
+      background-color: #ff9800;
+      /* Orange */
+  }
+
+  .badge-green {
+      color: #fff;
+      background-color: #4caf50;
+      /* Vert */
+  }
+
+  .badge-red {
+      color: #fff;
+      background-color: #f44336;
+      /* Rouge */
+  }
+
+  .badge-inactive {
+    background-color: #a7a5a5;
+        /* Couleur grise plus foncée */
+        color: #333;
+        /* Couleur du texte */
+  }
+
+  

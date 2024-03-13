@@ -1,0 +1,31 @@
+.menu {
+    background-color: #333;
+}
+
+.menu-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    /* Utiliser Flexbox */
+}
+
+.menu-item {
+    margin-right: 20px;
+}
+
+.menu-item:last-child {
+    margin-right: 0;
+    /* Supprimer la marge droite pour le dernier élément */
+}
+
+.menu-item a {
+    text-decoration: none;
+    color: #fff;
+    padding: 10px 15px;
+    display: inline-block;
+}
+
+.menu-item a:hover {
+    background-color: #555;
+}
