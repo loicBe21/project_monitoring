@@ -88,6 +88,10 @@ defmodule PmLogin.Monitoring.Task do
     |> put_default_values_last_modif()
   end
 
+
+
+
+
   defp put_non_valided_status(changeset) do
     changeset
     |> put_change(:is_valid, false)
@@ -111,7 +115,7 @@ defmodule PmLogin.Monitoring.Task do
     |> Monitoring.validate_start_end
     |> Monitoring.validate_positive_estimated
     |> Monitoring.validate_start_deadline
-    |> Monitoring.validate_positive_performed
+    #|> Monitoring.validate_positive_performed
     |> Monitoring.validate_progression
     |> Monitoring.del_contrib_id_if_nil
     |> put_change(:updated_at, Services.current_date)
@@ -266,6 +270,19 @@ defmodule PmLogin.Monitoring.Task do
     |>cast(attrs , [:attributor_id,:is_valid])
     |> put_change(:is_valid, true)
 
+
+  end
+
+
+  def update_task_changeset(task , attrs) do
+    task
+    |> cast(attrs  , [:title, :description, :attributor_id, :contributor_id , :progression, :date_start, :date_end, :estimated_duration, :deadline , :priority_id , :status_id , :project_id])
+    |> validate_required([:title, :progression, :date_start,  :estimated_duration, :deadline , :priority_id , :status_id , :project_id])
+    |> validate_length(:title, max: 300, message: "Nom de tâche trop long !")
+    |> validate_length(:description, max: 800, message: "Description trop longue !")
+    |> Monitoring.validate_start_end
+    |> Monitoring.validate_start_deadline
+    |> Monitoring.validate_positive_estimated
 
   end
 

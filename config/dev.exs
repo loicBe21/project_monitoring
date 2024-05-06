@@ -5,7 +5,7 @@ config :pm_login, PmLogin.Repo,
   username: "postgres", #odoo
   password: "MGbi@262**", #MGbi@262!-
   hostname: "localhost",
-  database: "pm_users_test",
+  database: "pm_users_test_db",
   port: 5433,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

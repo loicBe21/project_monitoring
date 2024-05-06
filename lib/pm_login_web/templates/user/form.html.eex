@@ -29,6 +29,9 @@
   <%= password_input f, :password_confirmation, class: "pass" %>
   <%= error_tag f, :password_confirmation %>
 
+  <%= label f, "Droit" %>
+  <%= select f, :right_id , @right_list  %>
+
 
   <%= submit "S'inscrire", class: "submit", id: "signin" %>
   <p id="signup">Vous avez déjà un compte? <%= link "connectez-vous.", to: Routes.page_path(@conn, :index) %></p>

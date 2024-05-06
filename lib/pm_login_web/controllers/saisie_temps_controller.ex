@@ -18,8 +18,8 @@ defmodule PmLoginWeb.SaisieTempsController do
  # end
 
  #url details saisie
-  def details1(conn, %{"id" => id , "date" => date , "start_date" => start_date , "end_date" => end_date , "status" => status , "right" => right }) do
-    LiveView.Controller.live_render(conn , PmLoginWeb.SaisieTemps.SaisieTempsDetailLive ,session: %{"curr_user_id" => get_session(conn, :curr_user_id) , "user_id" => id , "date" => date , "start_date" => start_date , "end_date" => end_date , "status" => status , "right" => right }, router: PmLoginWeb.Router)
+  def details1(conn, %{"id" => id , "date" => date , "start_date" => start_date , "end_date" => end_date , "status" => status , "right" => right , "username" => username }) do
+    LiveView.Controller.live_render(conn , PmLoginWeb.SaisieTemps.SaisieTempsDetailLive ,session: %{"curr_user_id" => get_session(conn, :curr_user_id) , "user_id" => id , "date" => date , "start_date" => start_date , "end_date" => end_date , "status" => status , "right" => right , "username" => username}, router: PmLoginWeb.Router)
   end
 
   #url index saisie
@@ -28,8 +28,8 @@ defmodule PmLoginWeb.SaisieTempsController do
   end
 
   #url siaise de temps espace admin
-  def index_admin1(conn, %{"start_date" => start_date , "end_date" => end_date , "status" => status , "right" => right}) do
-    LiveView.Controller.live_render(conn , PmLoginWeb.SaisieTemps.SaisieAdminPageLive ,session: %{"curr_user_id" => get_session(conn, :curr_user_id),"start_date" => start_date , "end_date" => end_date , "status" => status , "right" => right}, router: PmLoginWeb.Router)
+  def index_admin1(conn, %{"start_date" => start_date , "end_date" => end_date , "status" => status , "right" => right , "username" => username}) do
+    LiveView.Controller.live_render(conn , PmLoginWeb.SaisieTemps.SaisieAdminPageLive ,session: %{"curr_user_id" => get_session(conn, :curr_user_id),"start_date" => start_date , "end_date" => end_date , "status" => status , "right" => right , "username" => username}, router: PmLoginWeb.Router)
   end
 
   #creation d'une ligne de saisie
@@ -41,11 +41,14 @@ defmodule PmLoginWeb.SaisieTempsController do
     attrs = %{"date_entries" => Utilities.date_to_datetime(Utilities.parse_date_string(date_entries)), "user_id" => user_id, "task_id" => task_id, "project_id" => project_id, "libele" => libele, "time_value" => time_value}
      case SaisieTemps.save_entries(attrs) do
       {:ok, _time_entry} ->
+        IO.puts " makato amin erreur amin succes"
         conn
         |> put_status(:ok)
-        |> json(%{status: "success"})
+        |> json(%{status: "success" , message: "time entries saved"})
 
       {:error, message} ->
+        IO.puts " makato amin erreur "
+        IO.inspect message
         conn
         |> put_status(:bad_request)
         |> json(%{status: "error", message: message})

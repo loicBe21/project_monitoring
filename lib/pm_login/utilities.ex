@@ -273,7 +273,33 @@ defmodule PmLogin.Utilities do
   end
 
 
+ #fonction de formatage d'une nombre donnée en un chaine decimal
+  def format_decimal(value) when is_binary(value) do
+    case Float.parse(value) do
+      {val, _} when is_integer(val) ->
+        "#{val}.0"
+      {val, _} ->
+        "#{val}"
+      :error ->
+        "La valeur n'est pas une décimale valide."
+    end
+  end
 
+
+
+
+# Convertit les heures en minutes et arrondit à l'entier le plus proche
+  def hours_to_rounded_minutes(hours) do
+    hours
+    |> multiply_by_sixty()
+    |> round()
+    |> trunc()
+  end
+
+  # Fonction pour multiplier par 60
+  defp multiply_by_sixty(value) do
+    value * 60
+  end
 
 
 

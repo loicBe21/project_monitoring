@@ -6,48 +6,95 @@
       <p>Vérifiez vos informations ci-dessous</p>
     </div>
   <% end %>
-<div >
-  <div>
-    <div style="display: flex;justify-content: space-around;margin-bottom:20px;">
-    <img class="profile-pic-edit" alt="image 1" src=<%= Routes.static_path(@socket, "/profile_pic/#{@user.profile_picture}") %> />
-    </div>
-    <span style="font-weight: bold; margin-bottom:20px;">Changer photo de profil : <span class="btn btn-lg btn-primary file_input_btn">
-    <%= file_input f, :photo, class: "file_inputs" %>
-    séléctionner photo
-    <i class="bi bi-camera-fill"></i>
-    </span></span>
-    
-    <div style="font-weight: bold;">Nom :</div>
-    <%= text_input f, :username %>
-    <%= error_tag f, :username %>
-    <p style="font-size: smaller;color: gray;">Modifier votre nom modifie aussi votre identifiant !</p>
-    <div style="font-weight: bold;">Mail :</div>
-    <%= text_input f, :email %>
-    <%= error_tag f, :email %>
-    <div style="font-weight: bold;">Téléphone :</div>
-    <%= text_input f, :phone_number %>
-    <%= error_tag f, :phone_number %>
+  <div >
     <div>
-    <%= link "Modifier mot de passe",to: Routes.user_path(@socket, :edit_password, @user), class: "btn btn-outline-dark btn-lg ", id: "signin", style: "margin-bottom:20px;" %>
+      <%#
+        <div style="display: flex;justify-content: space-around;margin-bottom:20px;">
+      <img class="profile-pic-edit" alt="image 1" src=<%= Routes.static_path(@socket, "/profile_pic/#{@user.profile_picture}") %> <%# />
+      </div>
+      <%# <%= file_input f, :photo, class: "file-uploader", onchange: "upload()", accept: "image/*" %>
+      <%# séléctionner photo %>
+
+      <!--  Start Style button upload - Ravo -->
+      <div class="profile-picture" style="display: flex;justify-content: space-around;margin-bottom:20px;">
+        <img class="profile-pic-edit" alt="image 1" id="output" width="200" src=<%= Routes.static_path(@socket, "/profile_pic/#{@user.profile_picture}") %> />
+      </div>
+        <label class="upload-icon" for="file-uploader">
+          <i class="bi bi-camera-fill fa-lg" aria-hidden="true"></i>
+        </label>
+        <%= file_input f, :photo, class: "file-uploader", id: "file-uploader", onchange: "upload()", accept: "image/*" %>
+        <style>
+          .file-uploader {
+            display: none;
+          }
+
+          .upload-icon {
+            cursor: pointer;
+            font-size: 3rem;
+          }
+
+        </style>
+        <script>
+          function upload() {
+
+            const fileUploadInput = document.querySelector('.file-uploader');
+
+            // using index [0] to take the first file from the array
+            const image = fileUploadInput.files[0];
+
+            // check if the file selected is not an image file
+            if (!image.type.includes('image')) {
+              return alert('Only images are allowed!');
+            }
+
+            // check if size (in bytes) exceeds 10 MB
+            if (image.size > 10_000_000) {
+              return alert('Maximum upload size is 10MB!');
+            }
+
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(image);
+
+            fileReader.onload = (fileReaderEvent) => {
+              const profilePicture = document.querySelector('.profile-pic-edit');
+              profilePicture.src = fileReaderEvent.target.result;
+            }
+          }
+        </script>
+      </div>
+      <!--  End Style button upload - Ravo -->
+
+      <div style="font-weight: bold;">Nom :</div>
+      <%= text_input f, :username %>
+      <%= error_tag f, :username %>
+      <p style="font-size: smaller;color: gray;">Modifier votre nom modifie aussi votre identifiant !</p>
+      <div style="font-weight: bold;">Mail :</div>
+      <%= text_input f, :email %>
+      <%= error_tag f, :email %>
+      <div style="font-weight: bold;">Téléphone :</div>
+      <%= text_input f, :phone_number %>
+      <%= error_tag f, :phone_number %>
+      <div>
+      <%= link "Modifier mot de passe",to: Routes.user_path(@socket, :edit_password, @user), class: "btn btn-outline-dark btn-lg ", id: "signin", style: "margin-bottom:20px;" %>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+      <span><%= submit "Appliquer modifications", class: "card-button-green", id: "signin", style: "text-transform: capitalize;" %></span> <%# Capitalize the text in button submit - Ravo %>
+      <span><a href="<%= Routes.user_path(@socket, :edit_profile, @user) %>" class="card-button-orange" > Annuler</a></span>
     </div>
   </div>
-  
-  <div style="display: flex; justify-content: space-between;">
-    <span><%= submit "Appliquer modifications", class: "card-button-green", id: "signin" %></span>
-    <span><a href="<%= Routes.user_path(@socket, :edit_profile, @user) %>" class="card-button-orange" > Annuler</a></span>
+
+
+  <div id="right-row" class="row">
+
+
+
+
+    </div>
   </div>
-</div>
 
 
-<div id="right-row" class="row">
-
-  
-
-
-  </div>
-</div>
-
-  
 
 
 <% end %>

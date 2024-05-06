@@ -23,6 +23,7 @@ defmodule PmLoginWeb.Project.BoardLive do
   alias PmLoginWeb.Router.Helpers, as: Routes
   alias PmLogin.Email
   alias PmLogin.Utilities
+  alias PmLogin.MonitoringV2
 
   def mount(_params, %{"curr_user_id" => curr_user_id, "pro_id" => pro_id}, socket) do
     if connected?(socket), do: Kanban.subscribe()
@@ -68,11 +69,18 @@ defmodule PmLoginWeb.Project.BoardLive do
     priorities = Monitoring.list_priorities()
     list_priorities = Enum.map(priorities, fn %Priority{} = p -> {p.title, p.id} end)
 
+    #ajout des admin dans la liste déroulante de création de taches
+    admin_users = Login.list_admins_users()
+    list_admins = Enum.map(admin_users, fn %User{} = a -> {a.username, a.id} end)
     attributors = Login.list_attributors()
     list_attributors = Enum.map(attributors, fn %User{} = a -> {a.username, a.id} end)
 
     contributors = Login.list_contributors()
     list_contributors = Enum.map(contributors, fn %User{} = p -> {p.username, p.id} end)
+
+
+    list_for_admin = list_admins ++ list_attributors ++ list_contributors
+    list_for_attributeur = list_attributors ++ list_contributors
 
 
     my_primary_tasks = Monitoring.list_primary_tasks(pro_id)
@@ -170,7 +178,12 @@ defmodule PmLoginWeb.Project.BoardLive do
        tasks_history: tasks_history,
        task_history: task_history,
        attrs_history: nil,
-       old_task: nil
+       old_task: nil ,
+       #pour afficher les admin dans la liste deroulante si admin
+       list_admins: list_admins ,
+       show_task_modal_1: false ,
+       list_for_admin:   Enum.sort_by(list_for_admin, &(&1)),
+       list_for_attributeur:  Enum.sort_by(list_for_attributeur, &(&1)) ,
      )
      |> allow_upload(:file,
        accept:
@@ -1345,7 +1358,7 @@ end
         if Monitoring.is_a_child?(real_task) and Kanban.get_stage!(card.stage_id).status_id == 5 and
              real_task.status_id != 5 do
 
-          IO.puts "REFA INPNA N MAKATO LETI EEEEEEEE  ***************************************************************************"
+
           # IO.puts "CHILD:"
           # IO.inspect real_task
           # IO.puts " AVEC PARENT:"
@@ -1878,7 +1891,7 @@ end
   end
 
   def handle_event("submit_secondary", %{"task" => params}, socket) do
-    # IO.puts("input")
+    IO.inspect params
     hour = String.to_integer(params["hour"])
     minutes = String.to_integer(params["minutes"])
 
@@ -1974,8 +1987,8 @@ end
       if Login.get_user!(params["attributor_id"]).right_id == 3,
         do: Map.put(params, "contributor_id", params["attributor_id"]),
         else: params
-
-    # IO.inspect new_params
+      IO.puts "*************************************************************"
+     IO.inspect new_params
 
     case Monitoring.create_task_with_card(new_params) do
       {:ok, task} ->
@@ -2087,6 +2100,16 @@ end
         # IO.inspect changeset.errors
         {:noreply, socket |> assign(modif_changeset: changeset)}
     end
+  end
+
+  def handle_event("show_moadal_1", _params, socket) do
+    {:noreply , socket |> assign(show_task_modal_1: true)}
+  end
+
+  def handle_event("save_task" , params , socket) do
+    IO.inspect params
+    MonitoringV2.create_task(params)
+    {:noreply , socket}
   end
 
   def render(assigns) do

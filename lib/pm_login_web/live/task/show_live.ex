@@ -23,6 +23,9 @@ defmodule PmLoginWeb.Task.ShowLive do
     modif_changeset = Monitoring.change_task(%Task{})
     priorities = Monitoring.list_priorities()
     list_priorities = Enum.map(priorities, fn %Priority{} = p -> {p.title, p.id} end)
+    #pour les afficher les admin dans la liste deroulante
+    admin_users = Login.list_admins_users()
+    list_admins = Enum.map(admin_users, fn %User{} = a -> {a.username, a.id} end)
 
     contributors = Login.list_contributors()
     list_contributors = Enum.map(contributors, fn %User{} = p -> {p.username, p.id} end)
@@ -47,6 +50,7 @@ defmodule PmLoginWeb.Task.ShowLive do
     {:ok,
        socket
        |> assign(
+       list_admins: list_admins ,
        form: false, curr_user_id: curr_user_id, show_notif: false,id: id,
        task: task,
        show_comments_modal: false,
@@ -66,6 +70,7 @@ defmodule PmLoginWeb.Task.ShowLive do
        modif_changeset: modif_changeset,
        comment_changeset: Monitoring.change_comment(%Comment{}),
        notifs: Services.list_my_notifications_with_limit(curr_user_id, 4))
+
        |> allow_upload(:file,
          accept:
            ~w(.png .jpeg .jpg .pdf .txt .odt .ods .odp .csv .xml .xls .xlsx .ppt .pptx .doc .docx),

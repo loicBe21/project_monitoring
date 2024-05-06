@@ -113,7 +113,8 @@
             <li class="nav__item">
               <div class="dropdown">
                 <a href={ Routes.user_path(@socket, :show, @curr_user_id) } class="nav__item__link">
-                <img class="profile-pic-header" src={Routes.static_path(@socket, "/#{PmLogin.Login.get_profile_picture(@curr_user_id) }")} width="50" style="position: relative;top: 5px;"/>
+              <img class="profile-pic-header"
+                src={Routes.static_path(@socket, "/profile_pic/#{PmLogin.Login.get_profile_picture(@curr_user_id) }" )} width="50" style="position: relative;top: 5px;" />
                 <p><%= PmLogin.Login.get_user!(@curr_user_id).username %></p></a>
                 <div class="dropdown-content">
                   <a href={ Routes.user_path(@socket, :show, @curr_user_id) } class="admin__links" style="display: flex;justify-content: space-between;">

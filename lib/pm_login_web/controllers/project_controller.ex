@@ -9,6 +9,7 @@ defmodule PmLoginWeb.ProjectController do
   alias PmLogin.Login
   alias PmLogin.Email
   alias PmLogin.Services
+  alias PmLogin.SaisieTemps
 
   def board(conn, %{"id" => id}) do
 
@@ -156,6 +157,8 @@ end
 
   end
 
+
+  #controller qui gere la modification d'un projet
   def edit(conn, %{"id" => id}) do
     if Login.is_connected?(conn) do
       cond do
@@ -165,7 +168,7 @@ end
           changeset = Monitoring.change_project(project)
 
           ac_list = Services.list_active_clients
-          ac_ids = [{'',''}] ++ Enum.map(ac_list, fn(%ActiveClient{} = ac) -> {ac.user.username, ac.id} end )
+          ac_ids = Enum.map(ac_list, fn(%ActiveClient{} = ac) -> {ac.user.username, ac.id} end )
 
           status = Monitoring.list_statuses_title()
 
@@ -173,7 +176,7 @@ end
           LiveView.Controller.live_render(conn, PmLoginWeb.Project.EditLive,
           session: %{"curr_user_id" => get_session(conn, :curr_user_id),
           "project" => project, "changeset" => changeset,
-          "ac_ids" => ac_ids, "status" => status}, router: PmLoginWeb.Router)
+          "ac_ids" => Enum.sort_by(ac_ids , &(&1)), "status" => status}, router: PmLoginWeb.Router)
 
         true ->
           conn
@@ -397,5 +400,9 @@ end
       |> Login.not_connected_redirection
     end
   end
+
+
+
+
 
 end

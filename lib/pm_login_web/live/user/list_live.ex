@@ -7,6 +7,8 @@ defmodule PmLoginWeb.User.ListLive do
   alias PmLogin.Login.Auth
   alias PmLogin.Services
   alias PmLogin.Login.User
+  alias PmLogin.AccountActionHistory
+  alias PmLogin.Login.AccountUserChange
 
   def mount(_params, %{"curr_user_id" => curr_user_id}, socket) do
     Services.subscribe()
@@ -21,9 +23,11 @@ defmodule PmLoginWeb.User.ListLive do
   end
 
   def handle_event("save-user", %{"user" => params}, socket) do
-    # IO.inspect(params)
+    user_connected_id =  socket.assigns.curr_user_id
+    changed_user = Login.get_user!(user_connected_id)
     case Login.create_user(params) do
       {:ok, user} ->
+        AccountActionHistory.record_change(user,changed_user, :new_acc)
         Login.broadcast_user_creation({:ok, user})
         {:noreply, socket |> put_flash(:info, "L'utilisateur #{params["username"]} a été créé") |> assign(form: false)}
 
@@ -164,7 +168,9 @@ defmodule PmLoginWeb.User.ListLive do
   end
 
   defp fetch(socket) do
-    assign(socket, users: Login.list_asc_auth(), rights: Login.list_rights(),sorted_by_username: false , sorted_by_email: false, sorted_by_status: false,show_modal: false, arch_id: nil)
+    right_list = Login.list_rights_without_archived
+    real_rights = Enum.map(right_list , fn %PmLogin.Login.Right{} = a -> {a.title , a.id} end)
+    assign(socket, users: Login.list_asc_auth(), rights: Login.list_rights(), real_rights: real_rights,sorted_by_username: false , sorted_by_email: false, sorted_by_status: false,show_modal: false, arch_id: nil)
   end
 
   def render(assigns) do
@@ -184,9 +190,15 @@ defmodule PmLoginWeb.User.ListLive do
       {ModalLive, :button_clicked, %{action: "arch", param: arch_id}},
       socket
     ) do
+      changed_user = Login.get_user!(socket.assigns.curr_user_id)
       user = Login.get_user!(arch_id)
-      Login.archive_user(user)
+
+      #Login.archive_user(user)
       # PmLoginWeb.UserController.archive(socket, user.id)
+      Login.archive_user(user)
+      account_change_record =  AccountActionHistory.record_change(user,changed_user, :arch)
+      IO.inspect account_change_record
+
   {:noreply,
     socket
     |> put_flash(:info, "L'utilisateur #{user.username} a bien été archivé!")

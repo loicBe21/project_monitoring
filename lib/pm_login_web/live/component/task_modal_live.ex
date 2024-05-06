@@ -1,4 +1,4 @@
-defmodule PmLoginWeb.LiveComponent.TaskModalLive do
+ defmodule PmLoginWeb.LiveComponent.TaskModalLive do
   use Phoenix.LiveComponent
   import Phoenix.HTML.Form
   import PmLoginWeb.ErrorHelpers
@@ -95,10 +95,19 @@ defmodule PmLoginWeb.LiveComponent.TaskModalLive do
 
                     </div>
 
-                  <%= if not @is_contributor do %>
+                  <%= if not @is_contributor and not  @is_admin do %>
                     <div class="column">
                       <label class="zoom-out">Assigner intervenant</label>
                       <%= select f, :contributor_id, @attributors ++ @contributors, style: "width: -webkit-fill-available; width: -moz-available; height: 38px;" %>
+                      <div class="zoom-out">
+                        <%= error_tag f, :contributor_id %>
+                      </div>
+                    </div>
+                  <% end %>
+                  <%= if not @is_contributor and   @is_admin do %>
+                    <div class="column">
+                      <label class="zoom-out">Assigner intervenant </label>
+                      <%= select f, :contributor_id, @list_admins++@attributors ++ @contributors,   id: "custom_select_id"   %>
                       <div class="zoom-out">
                         <%= error_tag f, :contributor_id %>
                       </div>

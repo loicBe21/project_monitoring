@@ -2,12 +2,14 @@ defmodule PmLoginWeb.User.AdminEditprofileLive do
   use Phoenix.LiveView
   alias PmLogin.Services
 
+
   def mount(_params, %{"curr_user_id" => curr_user_id, "user" => user,"changeset" => changeset}, socket) do
     Services.subscribe()
 
     {:ok,
        socket
-       |> assign(user: user, changeset: changeset,curr_user_id: curr_user_id, show_notif: false, notifs: Services.list_my_notifications_with_limit(curr_user_id, 4)),
+       |> assign(user: user, changeset: changeset,curr_user_id: curr_user_id, show_notif: false, notifs: Services.list_my_notifications_with_limit(curr_user_id, 4))
+       |>allow_upload(:photo, accept: ~w(.jpg .jpeg .png), max_entries: 1),
        layout: {PmLoginWeb.LayoutView, "admin_layout_live.html"}
        }
   end
@@ -42,6 +44,13 @@ defmodule PmLoginWeb.User.AdminEditprofileLive do
     curr_user_id = socket.assigns.curr_user_id
     length = socket.assigns.notifs |> length
     {:noreply, socket |> assign(notifs: Services.list_my_notifications_with_limit(curr_user_id, length))}
+  end
+
+
+
+  def handle_event("save_update" , users_params , socket) do
+    IO.inspect users_params
+    {:noreply , socket}
   end
 
   def render(assigns) do

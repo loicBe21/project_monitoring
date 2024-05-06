@@ -7,6 +7,7 @@ defmodule PmLoginWeb.UserController do
   alias PmLogin.Login.Auth
   alias Phoenix.LiveView
   alias PmLogin.Monitoring
+  alias PmLogin.AccountActionHistory
 
   def index(conn, _params) do
 
@@ -100,6 +101,7 @@ defmodule PmLoginWeb.UserController do
 
   def new(conn, _params) do
     changeset = Login.change_user(%User{})
+
     render(conn, "new.html", changeset: changeset, layout: {PmLoginWeb.LayoutView, "register_layout.html"})
   end
 
@@ -231,7 +233,9 @@ defmodule PmLoginWeb.UserController do
     IO.inspect user_params
 
     case Login.update_profile(user, user_params) do
-      {:ok, user} ->
+      {:ok, user_updated} ->
+        account_change_record =  AccountActionHistory.record_own_changes(user_updated , user)
+        IO.inspect account_change_record
         conn
         |> put_flash(:info, "Profil mis à jour.")
         |> redirect(to: Routes.user_path(conn, :show, user))
@@ -273,13 +277,21 @@ defmodule PmLoginWeb.UserController do
 
 
 
+
+
+
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Login.get_user!(id)
-
+    user_connected_id = get_session(conn , :curr_user_id)
+    changed_user  = Login.get_user!(user_connected_id)
     # IO.inspect user_params
 
     case Login.update_user(user, user_params) do
-      {:ok, user} ->
+      {:ok, user_updated } ->
+
+        account_change_record =  AccountActionHistory.record_change(user_updated,changed_user, :change_role)
+
+        IO.inspect account_change_record
         conn
         |> put_flash(:info, "Profil mis à jour.")
         |> redirect(to: Routes.user_path(conn, :edit, user))
@@ -315,17 +327,19 @@ defmodule PmLoginWeb.UserController do
     end
   end
 
-  def archive(conn, %{"id" => id}) do
 
+  #ce code n'est pas utilisé
+  def archive(conn, %{"id" => id}) do
+     IO.puts "makato"
     if Login.is_connected?(conn) do
+
       cond do
         Login.is_admin?(conn) ->
           user = Login.get_user!(id)
           Login.archive_user(user)
-
           conn
-          |> put_flash(:info, "Utilisateur #{user.username} archivé(e).")
-          |> redirect(to: Routes.user_path(conn, :list))
+            |> put_flash(:info, "Utilisateur #{user.username} archivé(e)!")
+            |> redirect(to: Routes.user_path(conn, :list))
 
         true ->
           conn

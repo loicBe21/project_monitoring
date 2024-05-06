@@ -5,11 +5,13 @@ defmodule PmLogin.Login do
   """
   import Plug.Conn
   import Ecto.Query, warn: false
+
   alias PmLogin.Repo
   alias PmLogin.Services.ActiveClient
   alias PmLogin.Services
   alias PmLogin.Login.{Right, User}
   alias PmLogin.Login.ContributorFunction, as: Function
+
 
   @topic inspect(__MODULE__)
   def subscribe do
@@ -393,6 +395,7 @@ defmodule PmLogin.Login do
     |> User.archive_changeset(params)
     |> Repo.update()
     |> broadcast_change([:user, :updated])
+
   end
 
   def list_admins_and_attributors(current_user_id) do
@@ -541,10 +544,15 @@ defmodule PmLogin.Login do
     |> Repo.update()
   end
 
+
+
+
+   #modification du code pour retourner les champs modifier
   def update_user(%User{} = user, attrs) do
-    user
-    |> User.right_changeset(attrs)
-    |> Repo.update()
+     user
+      |> User.right_changeset(attrs)
+      |> Repo.update()
+
   end
 
   def update_raw_user_password(%User{} = user, attrs) do
@@ -554,9 +562,10 @@ defmodule PmLogin.Login do
   end
 
   def update_profile(%User{} = user, attrs) do
-    user
+   user
     |> User.profile_changeset(attrs)
     |> Repo.update()
+
   end
 
   def update_password(%User{} = user, attrs) do

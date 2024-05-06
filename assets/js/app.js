@@ -4,24 +4,12 @@ import "../css/app.css";
 
 import "./BoardControle.js";
 
-/*
-import 'tom-select'
+import "tom-select";
+import { addRow, haveLineNotSaved } from "./tom_select_saisie_page.js";
 import TomSelect from "tom-select";
-
-var test =
-
-
-
-
-
-  new TomSelect('#select-person');
-
-
-
-
-console.log(test);
-*/
-
+import { desactivateAllinputs, showTask } from "./showing_task.js";
+import {loadForm} from "./new_task.js";
+import {changeFaviconByTheme} from "./favicon.js";
 
 //import "./table_saisie_temp_controle.js"
 
@@ -60,11 +48,55 @@ import {
   HorizontalBarChart,
   StackedBarChart,
   LineChart,
-  SurveyChart
+  SurveyChart,
 } from "./chart.js";
 import chart from "chart.js/dist/chart";
 
+/*
+document.addEventListener('DOMContentLoaded', function () {
+  // Vérifier si les éléments existent sur la page
+  const tableBody = document.getElementById('record-table-body');
+  const addRowLink = document.getElementById('addRowIcon');
+  const dataContainer = document.getElementById('data-container');
 
+  // Vérifier si les éléments nécessaires existent
+  if (tableBody && addRowLink && dataContainer) {
+    // Récupérer les données uniquement si les éléments existent
+    const userId = dataContainer.dataset.userId;
+    //console.log(userId)
+    const date = dataContainer.dataset.today;
+    //console.log(date)
+    const username = dataContainer.dataset.username;
+    //console.log(username)
+    //console.log(dataContainer.dataset.projects)
+    const projects = JSON.parse(dataContainer.dataset.projects);
+    //console.log(projects)
+
+    // Ajouter un écouteur d'événements uniquement si l'icône d'ajout de ligne existe
+    addRowLink.addEventListener('click', function () {
+
+      lineNotSaved = haveLineNotSaved(tableBody);
+      console.log(lineNotSaved);
+      if (!lineNotSaved) {
+        addRow(tableBody, TomSelect, userId, date, username, projects);
+      }
+      else {
+
+        var addRowIcon = document.querySelector('#addRowIcon i');
+        console.log(addRowIcon);
+        addRowLink.classList.add('non-cliquable');
+        addRowIcon.style.cursor = 'not-allowed';
+
+      }
+
+
+    });
+  }
+
+
+
+});
+*/
 const Hooks = {};
 
 // Hooks.DoughNutChart = {
@@ -74,19 +106,158 @@ const Hooks = {};
 //   }
 // }
 
-Hooks.TomSelectHook = {
+//hooks pour gerer les saisie de temps
+//nb : utiliser par la page saisie_index.html , saisie_details.html
+
+Hooks.saisieAction = {
   mounted() {
-    const selectElement = this.el;
-    const tomSelect = new TomSelect(selectElement, {
-     
-      searchable: true,
-      sortField: {
-        field: "text",
-        direction: "asc"
-      }
-    });
+    const tableBody = document.getElementById("record-table-body");
+    const addRowLink = document.getElementById("addRowIcon");
+    const dataContainer = document.getElementById("data-container");
+    // Vérifier si les éléments nécessaires existent
+    if (tableBody && addRowLink && dataContainer) {
+      // Récupérer les données uniquement si les éléments existent
+      const userId = dataContainer.dataset.userId;
+      //console.log(userId)
+      const date = dataContainer.dataset.today;
+      //console.log(date)
+      const username = dataContainer.dataset.username;
+      //console.log(username)
+      //console.log(dataContainer.dataset.projects)
+      const projects = JSON.parse(dataContainer.dataset.projects);
+      //console.log(projects)
+
+      // Ajouter un écouteur d'événements uniquement si l'icône d'ajout de ligne existe
+      addRowLink.addEventListener("click", function () {
+        lineNotSaved = haveLineNotSaved(tableBody);
+        console.log(lineNotSaved);
+        if (!lineNotSaved) {
+          addRow(tableBody, TomSelect, userId, date, username, projects);
+        } else {
+          var addRowIcon = document.querySelector("#addRowIcon i");
+          console.log(addRowIcon);
+          addRowLink.classList.add("non-cliquable");
+          addRowIcon.style.cursor = "not-allowed";
+        }
+      });
+    }
+  },
+};
+
+// Hooks: Dynamic changement Favicon
+Hooks.dynamicFavicon = {
+  mounted() {
+    changeFaviconByTheme()
   }
 }
+
+//hooks: gestion de l'affichage de la details pages
+
+Hooks.showTask = {
+  mounted() {
+    desactivateAllinputs();
+    const profile = this.el.dataset.profile;
+    console.log(profile);
+    showTask(profile);
+  },
+  updated() {
+    desactivateAllinputs();
+  }
+};
+
+
+Hooks.newTask = {
+  updated() {
+    loadForm();
+  }
+}
+
+
+
+
+
+
+/* hooks phoenix pour les changement couleur des lignes survolé
+mettre cette hooks en attribut du balise <table></table> si le table a besoin de cette fonctionalité
+NB : a mettre uniquement sur une element html table
+
+*/
+
+Hooks.tableHover = {
+  mounted() {
+    const table = this.el; // Récupérer la table à partir de this.el
+
+    table.querySelectorAll("tbody tr").forEach((row) => {
+      let currentColor = "";
+
+      row.addEventListener("mouseover", () => {
+        currentColor = row.style.backgroundColor;
+        row.style.backgroundColor = "#60b0f0";
+      });
+
+      row.addEventListener("mouseout", () => {
+        row.style.backgroundColor = currentColor;
+      });
+    });
+  },
+};
+
+Hooks.CustomSampleSelect = {
+  mounted() {
+    console.log("CustomSampleSelect hook initialized");
+
+    // Récupérer l'élément select
+    var selectElement = document.getElementById("mySelect");
+
+    // Assurez-vous que l'élément select est rendu dans le DOM
+    if (selectElement) {
+      console.log("Element found:", selectElement);
+
+      // Initialisez TomSelect avec l'élément select s'il n'existe pas déjà d'instance
+      if (!selectElement.tomselect) {
+        selectElement.tomselect = new TomSelect(selectElement, {
+          // Configurations de TomSelect ici
+          create: false,
+          sortField: {
+            field: "text",
+            direction: "asc",
+          },
+        });
+        console.log("TomSelect options:", selectElement.tomselect.options);
+      }
+    } else {
+      console.error("Select element not found");
+    }
+  },
+  updated() {
+    console.log("CustomSampleSelect hook updated");
+
+    // Récupérer l'élément select
+    var selectElement = document.getElementById("mySelect");
+
+    // Vérifiez si une instance de TomSelect est attachée à l'élément select
+    if (selectElement && selectElement.tomselect) {
+      console.log("Element found:", selectElement);
+
+      // Supprimez toutes les options actuelles de TomSelect
+      selectElement.tomselect.clearOptions();
+
+      // Ajoutez de nouvelles options à TomSelect à partir de l'élément select
+      var selectOptions = selectElement.querySelectorAll("option");
+      selectOptions.forEach(function (option) {
+        selectElement.tomselect.addOption({
+          value: option.value,
+          text: option.textContent,
+        });
+      });
+
+      // Actualisez le TomSelect pour refléter les modifications
+      selectElement.tomselect.refreshOptions();
+    } else {
+      console.error("Select element or TomSelect instance not found");
+    }
+  },
+};
 
 Hooks.CsvExportHook = {
   mounted() {
@@ -97,27 +268,19 @@ Hooks.CsvExportHook = {
     this.el.removeEventListener("click", this.handleExportClick);
   },
 
- 
-
-
   handleExportClick(event) {
-
-  
-
-  
-
     let csvData = this.el.getAttribute("data-csv");
-    console.log("avant :" ,csvData)
-    csvData = csvData.replace(/\\r\\n/g, '\n')
+    console.log("avant :", csvData);
+    csvData = csvData.replace(/\\r\\n/g, "\n");
     //let test = "Name,Age,City\nJohn,30,New York\nJane,25,San Francisco\nBob,35,Chicago";
-    console.log ("apres :" ,csvData)
+    console.log("apres :", csvData);
     // Créer un objet Blob à partir de la chaîne CSV
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
 
     // Créer un élément <a> pour télécharger le fichier CSV
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
-    link.download = 'exemple.csv';
+    link.download = "exemple.csv";
 
     // Ajouter l'élément <a> à la page
     document.body.appendChild(link);
@@ -130,8 +293,6 @@ Hooks.CsvExportHook = {
 
     // ... Autres actions à effectuer avec csvData ...
   },
-
-
 };
 
 Hooks.HorizontalBarChart = {
@@ -166,7 +327,6 @@ Hooks.StackedBarChart = {
   },
 };
 
-
 Hooks.SurveyChart = {
   mounted() {
     console.log("is mounted");
@@ -174,7 +334,7 @@ Hooks.SurveyChart = {
     const { values } = JSON.parse(this.el.dataset.chartData);
 
     this.mychart = new SurveyChart(this.el, values);
-  }
+  },
 };
 
 // Hooks.LineChart = {
@@ -384,13 +544,13 @@ navToggle.addEventListener("click", function () {
     this.setAttribute("aria-expanded", "true");
   }
 });
- // Récupérez l'élément par son ID
- var copyrightIcon = document.getElementById('copyright__icon');
+// Récupérez l'élément par son ID
+var copyrightIcon = document.getElementById("copyright__icon");
 
- // Vérifiez si l'élément a été trouvé avant de le modifier
- if (copyrightIcon) {
-     copyrightIcon.innerHTML = 'copyright PHIDIA / Project monitoring -2024';
- }
+// Vérifiez si l'élément a été trouvé avant de le modifier
+if (copyrightIcon) {
+  copyrightIcon.innerHTML = "copyright PHIDIA / Project monitoring -2024";
+}
 const menuBtn = document.querySelector(".menu-btn");
 let menuOpen = false;
 menuBtn.addEventListener("click", () => {
@@ -436,4 +596,3 @@ liveSocket.connect();
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket;
-

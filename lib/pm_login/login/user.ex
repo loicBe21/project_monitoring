@@ -7,6 +7,7 @@ defmodule PmLogin.Login.User do
   alias PmLoginWeb.Router.Helpers, as: Routes
   alias PmLogin.Login.ContributorFunction
   alias PmLogin.Monitoring.TaskRecord
+  alias PmLogin.Services
 
   schema "users" do
     field :email, :string
@@ -19,6 +20,7 @@ defmodule PmLogin.Login.User do
     # field :function_id, :id
     belongs_to :current_record, TaskRecord
     belongs_to :function, ContributorFunction
+    field :archived_at, :date
     timestamps()
   end
 
@@ -39,11 +41,13 @@ defmodule PmLogin.Login.User do
   def restore_changeset(user, attrs) do
     user
     |> cast(attrs, [:right_id])
+    |> put_change(:archived_at, nil)
   end
 
   def archive_changeset(user, attrs) do
     user
-    |> cast(attrs, [:right_id])
+    |> cast(attrs, [:right_id ])
+    |> put_change(:archived_at, Date.utc_today())
   end
 
   def authenticate(user, attrs) do
@@ -240,11 +244,12 @@ defmodule PmLogin.Login.User do
   def put_record_changeset(user, attrs) do
     user
     |> cast(attrs, [:current_record_id])
+
   end
 
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email, :password, :function_id, :current_record_id , :phone_number])
+    |> cast(attrs, [:username, :email, :password, :function_id, :current_record_id , :phone_number , :right_id])
     |> validate_required_username
     |> validate_required_password
     |> validate_required_email
@@ -255,7 +260,7 @@ defmodule PmLogin.Login.User do
     |> validate_confirmation(:password, message: "Les mots de passe ne correspondent pas")
     |>validate_format(:phone_number, ~r/\A\d{10}\z/, message: "doit être un numéro de téléphone valide")
     |> crypt_pass
-    |> put_default_right
+    #|> put_default_right
     |> put_default_profile_picture
     |> put_change(:function_id, nil)
   end

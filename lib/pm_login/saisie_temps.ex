@@ -109,7 +109,7 @@ defmodule PmLogin.SaisieTemps do
   #retourne les taches disponible pour la saisie de temps
   def get_projects_avalable_for_saisie() do
     #sql pour les projects en cours
-    sql_query = "SELECT * FROM projects WHERE status_id = 3 order by title asc"
+    sql_query = "SELECT id , title FROM projects WHERE status_id = 3 order by title asc"
     SqlUtilities.fetch_result(sql_query , [])
   end
 
@@ -117,7 +117,7 @@ defmodule PmLogin.SaisieTemps do
   #PmLogin.SaisieTemps.get_tasks_by_project
   #retourne la tache disponible par projet
   def get_tasks_by_project(project_id) do
-    sql_query =  "SELECT * FROM tasks WHERE project_id = $1 and status_id != 5 and status_id != 6 order by title asc"
+    sql_query =  "SELECT * FROM tasks WHERE project_id = $1 and status_id != 5 and status_id != 6 and status_id != 4 order by title asc"
     params = [project_id]
     SqlUtilities.fetch_result(sql_query , params)
 
@@ -132,7 +132,8 @@ defmodule PmLogin.SaisieTemps do
     time_entries.*,
     users.username ,
     tasks.title as task_title ,
-    projects.title as project_title
+    projects.title as project_title ,
+    v_projects_clients_details.clients_name
     FROM
         time_entries
     JOIN
@@ -141,6 +142,8 @@ defmodule PmLogin.SaisieTemps do
         tasks ON tasks.id = time_entries.task_id
     JOIN
         projects ON projects.id = time_entries.project_id
+    JOIN
+        v_projects_clients_details on v_projects_clients_details.project_id = time_entries.project_id
     WHERE
          user_id = $1 and date_trunc('day', date_entries) = $2 ::date
     ORDER BY time_entries.inserted_at asc
@@ -154,6 +157,7 @@ defmodule PmLogin.SaisieTemps do
 
   #calcule l'heure totale d'une liste de saisie
   def sum_time_values(saisies) do
+    IO.inspect saisies
     if Enum.empty?(saisies) do
       Decimal.new(0)
     else
@@ -173,6 +177,8 @@ defmodule PmLogin.SaisieTemps do
     left join
     time_entries_validee on users.id = time_entries_validee.user_id and time_entries_validee.date = $1
     join auth on auth.id = users.id
+    where
+    auth.right_id != 4 and auth.right_id != 100
     group by
     users.id , users.username , auth.title , auth.right_id ,time_entries_validee.inserted_at
     order by sum(time_entries.time_value) asc
@@ -192,12 +198,18 @@ defmodule PmLogin.SaisieTemps do
         false
 
       user_validator_id ->
-        #test le droit si admin ou non
-        case Login.get_user!(user_validator_id).right_id do
-          1 ->
-            true
-          _ ->
-            false
+        #verifier si la saisie est n'est pas deja validé , pour eviter les doublons
+        validation_line  = get_entrie_validee_line(changeset.changes.date , changeset.changes.user_id)
+        if validation_line == nil  do
+           #test le droit si admin ou non
+          case Login.get_user!(user_validator_id).right_id  do
+            1 ->
+              true
+            _ ->
+              false
+          end
+        else
+          false
         end
     end
   end
@@ -206,8 +218,12 @@ defmodule PmLogin.SaisieTemps do
   #on ajout dans cette fonction si il va y avoir d'autre validation
   defp validation_saisie(saisie_attrs) do
     changeset = TimeEntriesValidee.changeset(%TimeEntriesValidee{} , saisie_attrs)
+    IO.puts "makato"
+      IO.inspect changeset
      case changeset.valid? do
+
       true ->
+
         case can_validate_saisie?(changeset) do
           true ->
             {:ok, changeset}
@@ -227,7 +243,7 @@ defmodule PmLogin.SaisieTemps do
 
   #method de persistance des saisie validee
    def save_saisie_validee (saisie_attrs) do
-
+      IO.inspect "kakana"
       case validation_saisie(saisie_attrs) do
          {:ok , changeset}
           ->
@@ -239,7 +255,7 @@ defmodule PmLogin.SaisieTemps do
 
       end
 
-    end
+   end
 
 
 
@@ -251,16 +267,16 @@ defmodule PmLogin.SaisieTemps do
       case right_id do
         #tous profil confondue
         0 ->
-          "AND ( auth.right_id = 1 OR auth.right_id = 2 OR auth.right_id = 3 ) "
+          "AND ( auth.right_id = 1 OR auth.right_id = 2 OR auth.right_id = 3 OR auth.right_id = 100 ) "
         #only admin
         1 ->
-          "AND auth.right_id = 1 "
+          "AND (auth.right_id = 1 OR auth.right_id = 100)"
         2 ->
         #only attributeur
-          "AND auth.right_id = 2 "
+          "AND( auth.right_id = 2 OR auth.right_id = 100 )"
         3 ->
         #only contributteur
-          "AND auth.right_id = 3"
+          "AND( auth.right_id = 3 OR auth.right_id = 100)"
         _ ->
           ""
       end
@@ -282,20 +298,38 @@ defmodule PmLogin.SaisieTemps do
 
     end
 
+    defp username_condition(username) do
+      case username do
+         "" ->
+            " "
+         _ ->
+          " AND  auth.username ilike '%"<>username<>"%' "
+
+      end
+    end
+
 
     #retourne les saisie par parametre dynamique
+    #filtre par date debut date fin  droit et status et username
+    def get_resum_saisie_by_params(start_date , end_date , right_id , status , username) do
 
-    def get_resum_saisie_by_params(start_date , end_date , right_id , status) do
 
-      sql_query = "
-      SELECT
+
+
+      sql_query="SELECT
       generated_dates.date_trunc as date,
       auth.id AS user_id,
       COALESCE(SUM(time_entries.time_value), 0) AS time_value,
       auth.username ,
       auth.title ,
       auth.right_id ,
-      time_entries_validee.inserted_at as validation_date
+      users.inserted_at ,
+      users.archived_at,
+      time_entries_validee.inserted_at as validation_date ,
+        case
+          when time_entries_validee.inserted_at is null  then false
+          else true
+        end as status
       FROM
       (SELECT generate_series(
         $1 ::date,
@@ -308,13 +342,16 @@ defmodule PmLogin.SaisieTemps do
       time_entries ON generated_dates.date_trunc = date_trunc('day', time_entries.date_entries)
                     AND auth.id = time_entries.user_id
       LEFT JOIN time_entries_validee ON auth.id = time_entries_validee.user_id and generated_dates.date_trunc = time_entries_validee.date
+      LEFT JOIN users on users.id = auth.id
       WHERE
-      EXTRACT(ISODOW FROM generated_dates.date_trunc) BETWEEN 1 AND 5 -- Exclure samedi et dimanche (1=lundi, 2=mardi, ..., 7=dimanche)
-      AND auth.right_id != 4 and auth.right_id != 100 "<> right_id_conditions(right_id) <>"  "<> status_condition(status) <> "
+      EXTRACT(ISODOW FROM generated_dates.date_trunc) BETWEEN 1 AND 7 -- Exclure samedi et dimanche (1=lundi, 2=mardi, ..., 7=dimanche)
+      AND auth.right_id != 4   and auth.right_id != 5  and users.inserted_at < generated_dates.date_trunc
+      AND (users.archived_at IS NULL OR users.archived_at > generated_dates.date_trunc) "<> right_id_conditions(right_id) <>"  "<> status_condition(status) <> " "<> username_condition(username) <> "
       GROUP BY
-      generated_dates.date_trunc, auth.id, auth.username , time_entries_validee.inserted_at , auth.title , auth.right_id
+      generated_dates.date_trunc, auth.id, auth.username , time_entries_validee.inserted_at , auth.title , auth.right_id  , users.inserted_at , users.archived_at
       ORDER BY
-      generated_dates.date_trunc "
+      generated_dates.date_trunc
+      "
 
 
 
@@ -349,31 +386,31 @@ defmodule PmLogin.SaisieTemps do
 
 
     #verification status de l'entree si il n'est pas encore validable
-    def can_validate_an_entrie(entrie) do
-      if entrie.validation_status == 0 do
-        true
-      else
-        false
-      end
-    end
+    # def can_validate_an_entrie(entrie) do
+    #  if entrie.validation_status == 0 do
+    #    true
+    #  else
+    #   false
+    #  end
+    #end
 
     #creer une changeset de validation pour une entrie
-    def get_validation_entrie_changeset(entrie) do
-      TimeEntrie.validation_changeset(entrie , %{validation_status: 1 })  #%{validation_status: 1 } => status pour marquer une ligne validee
-    end
+   # def get_validation_entrie_changeset(entrie) do
+   #   TimeEntrie.validation_changeset(entrie , %{validation_status: 1 })  #%{validation_status: 1 } => status pour marquer une ligne validee
+   # end
 
-    def validate_entries(entries) do
-    entries
-      |> Enum.filter(&can_validate_an_entrie/1)
-      |> Enum.map(&get_validation_entrie_changeset/1)
-    end
+   # def validate_entries(entries) do
+   # entries
+   #   |> Enum.filter(&can_validate_an_entrie/1)
+   #   |> Enum.map(&get_validation_entrie_changeset/1)
+   # end
 
 
     #creer une changeset pour une nouvelle ligne de time_entries_validee
-    def create_entrie_validee_line_changeset(date_saisie , user_saisie , user_validator , totale_time_value , status) do
-      TimeEntriesValidee.create_changeset(%TimeEntriesValidee{} , %{date: date_saisie , time_value: totale_time_value , user_id: user_saisie , user_validator_id: user_validator ,validation_status: status})
+   # def create_entrie_validee_line_changeset(date_saisie , user_saisie , user_validator , totale_time_value , status) do
+   #   TimeEntriesValidee.create_changeset(%TimeEntriesValidee{} , %{date: date_saisie , time_value: totale_time_value , user_id: user_saisie , user_validator_id: user_validator ,validation_status: status})
 
-    end
+   # end
 
 
 
@@ -405,6 +442,33 @@ defmodule PmLogin.SaisieTemps do
         end
     end
 
+
+    #PmLogin.SaisieTemps.get_client_details_by_rpoject(69)
+    #fonction pour avoir les information rattacher a un projet
+    #return les details en tant que map
+    def get_client_details_by_rpoject(project_id) do
+      sql_query =  "SELECT * FROM v_projects_clients_details WHERE project_id = $1"
+      params =  [project_id]
+      #extract l'entete du list car cette liste return tjr une element
+      hd(SqlUtilities.fetch_result(sql_query , params))
+    end
+
+
+
+    def get_time_spent_per_task(task_id) do
+      sql_query = "SELECT sum(time_value) as time_spent from time_entries where task_id= $1"
+      params = [task_id]
+      hd(SqlUtilities.fetch_result(sql_query , params))
+    end
+
+
+    def get_time_spent_per_user_per_task(task_id) do
+      sql_query ="select sum(time_entries.time_value) as time_value , time_entries.user_id ,users.username  , time_entries.task_id
+      from time_entries join users on time_entries.user_id = users.id where time_entries.task_id = $1
+      group by time_entries.user_id , time_entries.task_id ,users.username"
+      params = [task_id]
+      SqlUtilities.fetch_result(sql_query , params)
+    end
 
 
 

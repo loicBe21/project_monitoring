@@ -53,6 +53,7 @@ border-color: black;
 }
 
 
+
 </style>
 <!-- CREATION DE PROJET-->
 <div>
@@ -83,9 +84,9 @@ border-color: black;
 <!-- CSS Mobile Middle-->
 
 <!-- CSS Mobile-->
-
-        <table id="tb-auth" class="table-sortable" style="margin-top: 30px; font-size: 13px">
-          <thead>
+<div id="table-container" style="max-height: 75vh; overflow-y: scroll; width: 100%; margin-top: 20px;">  <!--  Fixed the header - Ravo -->
+  <table id="tb-auth" class="table-sortable" style="/*margin-top: 30px;*/ font-size: 13px" phx-hook="tableHover">  <!--  Fixed the header - Ravo -->
+      <thead style="position: sticky; top: 0; z-index: 1; background-color: #f9f9f9;">  <!--  Fixed the header - Ravo -->
             <tr>
               <th>Nom</th>
               <th>Description</th>
@@ -99,11 +100,12 @@ border-color: black;
               <th></th>
             </tr>
           </thead>
+
           <tbody>
             <%= for project <- @projects do %>
               <tr style={"background: #{
                 case project.status_id do
-                  1 -> ""
+                  1 -> "#ffffff"
                   2 -> "#e74c3c"
                   3 -> "#f1c40f91"
                   4 -> "#be5e0aad"
@@ -182,6 +184,7 @@ border-color: black;
           </tbody>
         </table>
 
+</div> <!--  Fixed the header - Ravo -->
         <%= live_component(
           ClientModalRequestLive, 
           id: "confirm-arch", 
@@ -286,5 +289,20 @@ document.querySelectorAll(".table-sortable th").forEach(headerCell => {
         sortTableByColumn(tableElement, headerIndex, !currentIsAscending);
     });
 });
+
+  // JavaScript pour le survol des lignes
+/*  document.querySelectorAll('.table-sortable tbody tr').forEach(row => {
+    
+    row.addEventListener('mouseover', () => {
+      current_color = row.style.backgroundColor
+      console.log(current_color)
+      row.style.backgroundColor = '#60b0f0'; // Couleur de fond plus foncée lors du survol
+    });
+
+    row.addEventListener('mouseout', () => {
+      row.style.backgroundColor = current_color; // Retour à la couleur de fond par défaut lorsque le survol est terminé
+    });
+  });
+  */
 
 </script>

@@ -83,8 +83,13 @@ defmodule PmLoginWeb.LiveComponent.ModifModalLive do
                         </td>
                         <td data-label="Contributeur">
                           <%= if @is_admin or @is_attributor do %>
-                            <%= select f, :contributor_id, @attributors ++ @contributors, selected: @card.task.contributor_id, style: "width: 600px; margin-bottom: 0;" %>
-                            <%= error_tag_modif f, :contributor_id %>
+                            <%= if @is_admin do %>
+                              <%= select f, :contributor_id, @list_admins ++ @attributors ++ @contributors, selected: @card.task.contributor_id, style: "width: 600px; margin-bottom: 0;" %>
+                              <%= error_tag_modif f, :contributor_id %>
+                            <% else %>
+                              <%= select f, :contributor_id,  @attributors ++ @contributors, selected: @card.task.contributor_id, style: "width: 600px; margin-bottom: 0;" %>
+                              <%= error_tag_modif f, :contributor_id %>
+                            <% end %>
                           <% else %>
                             <%= if !is_nil(@card.task.contributor_id) do %>
                               <%= @card.task.contributor.username %>

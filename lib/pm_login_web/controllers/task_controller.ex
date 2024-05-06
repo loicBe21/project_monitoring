@@ -40,10 +40,13 @@ defmodule PmLoginWeb.TaskController do
   #   render(conn, "edit.html", task: task, changeset: changeset)
   # end
 
+
+
+  #l url de chargement de la page de details taches
   def show(conn, %{"id" => id}) do
 
     if Login.is_connected?(conn) do
-      LiveView.Controller.live_render(conn, PmLoginWeb.Task.ShowLive, session: %{"curr_user_id" => get_session(conn, :curr_user_id), "id" => id}, router: PmLoginWeb.Router)
+      LiveView.Controller.live_render(conn, PmLoginWeb.Task.ShowLive1, session: %{"curr_user_id" => get_session(conn, :curr_user_id), "id" => id}, router: PmLoginWeb.Router)
       # cond do
       #   Login.is_admin?(conn) or Login.is_attributor?(conn) ->
       #     changeset = Monitoring.change_project(%Project{})
@@ -97,10 +100,11 @@ defmodule PmLoginWeb.TaskController do
   end
 
 
-
+ #api qui retourne les taches et les details sur le client d'une projet
  def task_by_project(conn, %{"project_id" => project_id}) do
     tasks = SaisieTemps.get_tasks_by_project(String.to_integer(project_id))
-    json(conn, tasks)
+    client_details = SaisieTemps.get_client_details_by_rpoject(String.to_integer(project_id))
+    json(conn, %{tasks: tasks, client_details: client_details})
   end
 
 

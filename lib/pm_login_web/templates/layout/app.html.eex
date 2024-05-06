@@ -28,6 +28,7 @@
       <p class="alert alert-info basecontents" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p> -->
 
+      <link phx-hoox="dynamicFavicon" rel="icon" type="image/png" sizes="16x16" href="">
       <%= @inner_content %>
       <!-- <br/>
       <br/>

@@ -208,7 +208,7 @@ defmodule PmLogin.Monitoring do
 
       _ ->
         cond do
-          task.progression < 100 and Kanban.get_stage!(status_id).status_id == 4 ->
+          task.progression < 100 and (Kanban.get_stage!(status_id).status_id == 4 or Kanban.get_stage!(status_id).status_id == 5 ) ->
             changeset |> add_error(:message, "La tâche n'est pas encore achevée à 100%")
 
           true ->
@@ -3385,8 +3385,9 @@ defmodule PmLogin.Monitoring do
     stage_query = from(s in Stage)
     task_query = from(t in Task)
 
+
     query = from c in Card,
-      preload: [stage: ^stage_query, task: ^task_query],
+      preload: [stage: ^stage_query, task: ^task_query  ],
       where: c.task_id == ^id
     Repo.one(query)
   end
@@ -3452,5 +3453,7 @@ defmodule PmLogin.Monitoring do
 
 
   #PmLogin.Monitoring.get_my_task_active(129)
+
+
 
 end
